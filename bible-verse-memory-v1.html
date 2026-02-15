@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bible Verse Memory Game - John 13:34</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Comic+Neue:wght@700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Fredoka', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #2ec4b6 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Floating background elements */
+        .bg-decoration {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.1;
+            animation: float 20s infinite ease-in-out;
+        }
+
+        .bg-decoration:nth-child(1) {
+            width: 200px;
+            height: 200px;
+            background: white;
+            top: 10%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+
+        .bg-decoration:nth-child(2) {
+            width: 150px;
+            height: 150px;
+            background: #ffd700;
+            top: 60%;
+            right: 15%;
+            animation-delay: 3s;
+        }
+
+        .bg-decoration:nth-child(3) {
+            width: 100px;
+            height: 100px;
+            background: #ff69b4;
+            bottom: 20%;
+            left: 20%;
+            animation-delay: 6s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) translateX(0); }
+            25% { transform: translateY(-30px) translateX(20px); }
+            50% { transform: translateY(-15px) translateX(-20px); }
+            75% { transform: translateY(-40px) translateX(10px); }
+        }
+
+        .container {
+            background: white;
+            border-radius: 40px;
+            padding: 50px;
+            max-width: 1400px;
+            width: 100%;
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.3);
+            position: relative;
+            z-index: 1;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .title {
+            font-family: 'Comic Neue', cursive;
+            font-size: 3.5em;
+            color: #764ba2;
+            text-shadow: 3px 3px 0px #ffd700;
+            margin-bottom: 10px;
+            animation: bounce 1s ease-in-out;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .verse-reference {
+            font-size: 1.8em;
+            color: #667eea;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 30px;
+            gap: 20px;
+        }
+
+        .stat-box {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 20px 40px;
+            border-radius: 20px;
+            font-size: 1.6em;
+            font-weight: 600;
+            min-width: 200px;
+            text-align: center;
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+            transition: transform 0.2s;
+        }
+
+        .stat-box:hover {
+            transform: scale(1.05);
+        }
+
+        .stat-label {
+            font-size: 0.7em;
+            opacity: 0.9;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-size: 1.5em;
+            font-weight: 700;
+        }
+
+        .verse-container {
+            background: #f8f9ff;
+            border-radius: 30px;
+            padding: 50px;
+            margin-bottom: 30px;
+            min-height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 5px solid #667eea;
+        }
+
+        .verse-words {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+            font-size: 2.5em;
+            line-height: 1.6;
+        }
+
+        .word {
+            padding: 15px 25px;
+            border-radius: 15px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            user-select: none;
+            position: relative;
+        }
+
+        .word.visible {
+            background: #e0e7ff;
+            color: #4c1d95;
+        }
+
+        .word.hidden {
+            background: #ffd700;
+            color: transparent;
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.5);
+            animation: pulse 2s infinite;
+        }
+
+        .word.hidden:hover {
+            transform: scale(1.1);
+            box-shadow: 0 8px 25px rgba(255, 215, 0, 0.7);
+        }
+
+        .word.hidden:active {
+            transform: scale(0.95);
+        }
+
+        .word.revealed {
+            background: #fecaca;
+            color: #991b1b;
+            animation: reveal 0.5s ease;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @keyframes reveal {
+            0% { transform: scale(0.8); opacity: 0; }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .word.hidden::after {
+            content: '?';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #764ba2;
+            font-size: 1.2em;
+            font-weight: 700;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 20px 50px;
+            font-size: 1.8em;
+            font-weight: 700;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Fredoka', sans-serif;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            min-width: 220px;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+        }
+
+        .level-complete {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            background: white;
+            padding: 60px;
+            border-radius: 40px;
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.4);
+            text-align: center;
+            z-index: 1000;
+            transition: transform 0.5s ease;
+        }
+
+        .level-complete.show {
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .level-complete h2 {
+            font-size: 3.5em;
+            color: #10b981;
+            margin-bottom: 20px;
+            font-family: 'Comic Neue', cursive;
+        }
+
+        .level-complete p {
+            font-size: 2em;
+            color: #4b5563;
+            margin-bottom: 30px;
+        }
+
+        .stars {
+            font-size: 5em;
+            margin: 20px 0;
+            animation: sparkle 1s ease-in-out infinite;
+        }
+
+        @keyframes sparkle {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 999;
+            display: none;
+        }
+
+        .overlay.show {
+            display: block;
+        }
+
+        .instructions {
+            background: #fef3c7;
+            border: 4px solid #fbbf24;
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 30px;
+            font-size: 1.6em;
+            text-align: center;
+            color: #78350f;
+            font-weight: 600;
+        }
+
+        @media (max-width: 1200px) {
+            .verse-words {
+                font-size: 2em;
+            }
+            
+            .title {
+                font-size: 2.5em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-decoration"></div>
+    <div class="bg-decoration"></div>
+    <div class="bg-decoration"></div>
+
+    <div class="container">
+        <div class="header">
+            <h1 class="title">📖 Bible Verse Memory Game 📖</h1>
+            <div class="verse-reference">John 13:34</div>
+        </div>
+
+        <div class="instructions">
+            Tap the yellow boxes to see the words! Try to say the whole verse without clicking! 🌟
+        </div>
+
+        <div class="stats">
+            <div class="stat-box">
+                <div class="stat-label">Level</div>
+                <div class="stat-value" id="level">1</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">Score</div>
+                <div class="stat-value" id="score">100</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">Words Left</div>
+                <div class="stat-value" id="wordsLeft">0</div>
+            </div>
+        </div>
+
+        <div class="verse-container">
+            <div class="verse-words" id="verseWords"></div>
+        </div>
+
+        <div class="controls">
+            <button class="btn btn-primary" id="nextLevel">Next Level ➜</button>
+            <button class="btn btn-secondary" id="tryAgain">Try Again 🔄</button>
+            <button class="btn btn-danger" id="reset">Start Over 🏠</button>
+        </div>
+    </div>
+
+    <div class="overlay" id="overlay"></div>
+    <div class="level-complete" id="levelComplete">
+        <div class="stars">⭐⭐⭐</div>
+        <h2>Amazing Job!</h2>
+        <p>You completed Level <span id="completedLevel"></span>!</p>
+        <p>Your Score: <span id="finalScore"></span> points</p>
+        <button class="btn btn-primary" id="continueBtn">Continue! 🎉</button>
+    </div>
+
+    <script>
+        // Bible verse words
+        const verseText = "A new commandment I give to you, that you love one another: just as I have loved you, you also are to love one another.";
+        const words = verseText.split(' ');
+        
+        // Game state
+        let currentLevel = 1;
+        let currentScore = 100;
+        let hiddenWords = [];
+        let revealedWords = new Set();
+        
+        // Level configurations - which words to hide at each level
+        const levelConfigs = [
+            { hiddenIndices: [], description: "Learn the verse!" }, // Level 1: All visible
+            { hiddenIndices: [0, 4, 8, 12, 16, 20], description: "6 words hidden" }, // Level 2
+            { hiddenIndices: [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22], description: "12 words hidden" }, // Level 3
+            { hiddenIndices: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18], description: "Almost all hidden!" }, // Level 4
+            { hiddenIndices: Array.from({length: words.length}, (_, i) => i), description: "All words hidden!" } // Level 5: All hidden
+        ];
+        
+        // Initialize game
+        function initGame() {
+            renderVerse();
+            updateStats();
+        }
+        
+        // Render the verse with current level configuration
+        function renderVerse() {
+            const container = document.getElementById('verseWords');
+            container.innerHTML = '';
+            
+            const config = levelConfigs[currentLevel - 1];
+            hiddenWords = config.hiddenIndices;
+            revealedWords.clear();
+            
+            words.forEach((word, index) => {
+                const wordSpan = document.createElement('span');
+                wordSpan.textContent = word;
+                wordSpan.classList.add('word');
+                
+                if (hiddenWords.includes(index)) {
+                    wordSpan.classList.add('hidden');
+                    wordSpan.dataset.index = index;
+                    wordSpan.addEventListener('click', () => revealWord(wordSpan, index));
+                } else {
+                    wordSpan.classList.add('visible');
+                }
+                
+                container.appendChild(wordSpan);
+            });
+            
+            updateWordsLeft();
+        }
+        
+        // Reveal a word when clicked
+        function revealWord(wordSpan, index) {
+            if (revealedWords.has(index)) return;
+            
+            wordSpan.classList.remove('hidden');
+            wordSpan.classList.add('revealed');
+            revealedWords.add(index);
+            
+            // Deduct points
+            currentScore = Math.max(0, currentScore - 5);
+            updateStats();
+            
+            // Play reveal animation
+            wordSpan.style.animation = 'none';
+            setTimeout(() => {
+                wordSpan.style.animation = '';
+            }, 10);
+        }
+        
+        // Update statistics display
+        function updateStats() {
+            document.getElementById('level').textContent = currentLevel;
+            document.getElementById('score').textContent = currentScore;
+            updateWordsLeft();
+        }
+        
+        // Update words left counter
+        function updateWordsLeft() {
+            const wordsLeft = hiddenWords.length - revealedWords.size;
+            document.getElementById('wordsLeft').textContent = wordsLeft;
+        }
+        
+        // Show level complete modal
+        function showLevelComplete() {
+            document.getElementById('completedLevel').textContent = currentLevel;
+            document.getElementById('finalScore').textContent = currentScore;
+            document.getElementById('overlay').classList.add('show');
+            document.getElementById('levelComplete').classList.add('show');
+        }
+        
+        // Hide level complete modal
+        function hideLevelComplete() {
+            document.getElementById('overlay').classList.remove('show');
+            document.getElementById('levelComplete').classList.remove('show');
+        }
+        
+        // Next level
+        document.getElementById('nextLevel').addEventListener('click', () => {
+            if (currentLevel < levelConfigs.length) {
+                showLevelComplete();
+            } else {
+                alert('🎉 Congratulations! You completed all levels! 🎉');
+            }
+        });
+        
+        // Continue to next level
+        document.getElementById('continueBtn').addEventListener('click', () => {
+            hideLevelComplete();
+            currentLevel++;
+            currentScore = 100;
+            renderVerse();
+            updateStats();
+            
+            if (currentLevel > levelConfigs.length) {
+                alert('🎊 Amazing! You finished the entire game! 🎊');
+                currentLevel = 1;
+                currentScore = 100;
+                renderVerse();
+                updateStats();
+            }
+        });
+        
+        // Try again (reset current level)
+        document.getElementById('tryAgain').addEventListener('click', () => {
+            currentScore = 100;
+            revealedWords.clear();
+            renderVerse();
+            updateStats();
+        });
+        
+        // Reset game
+        document.getElementById('reset').addEventListener('click', () => {
+            if (confirm('Are you sure you want to start over from Level 1?')) {
+                currentLevel = 1;
+                currentScore = 100;
+                revealedWords.clear();
+                renderVerse();
+                updateStats();
+            }
+        });
+        
+        // Start the game
+        initGame();
+    </script>
+</body>
+</html>
