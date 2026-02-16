@@ -1,0 +1,1030 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bible Verse Memory Game</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Bubblegum+Sans&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --midnight: #011627;
+            --white: #fdfffc;
+            --teal: #2ec4b6;
+            --red: #e71d36;
+            --orange: #ff9f1c;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Fredoka', sans-serif;
+            background: var(--midnight);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Animated background pattern */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                radial-gradient(circle at 20% 30%, rgba(46, 196, 182, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(255, 159, 28, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 50% 50%, rgba(231, 29, 54, 0.05) 0%, transparent 50%);
+            animation: bgMove 20s ease-in-out infinite;
+        }
+
+        @keyframes bgMove {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            50% { transform: scale(1.1) rotate(5deg); }
+        }
+
+        .container {
+            background: var(--white);
+            border-radius: 40px;
+            padding: 50px;
+            max-width: 1400px;
+            width: 100%;
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Selection Screen Styles */
+        .selection-screen {
+            display: block;
+        }
+
+        .selection-screen.hidden {
+            display: none;
+        }
+
+        .game-screen {
+            display: none;
+        }
+
+        .game-screen.active {
+            display: block;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .title {
+            font-family: 'Bubblegum Sans', cursive;
+            font-size: 3.5em;
+            color: var(--teal);
+            margin-bottom: 10px;
+        }
+
+        @keyframes titleBounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        .subtitle {
+            font-size: 1.8em;
+            color: var(--teal);
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        /* Verse Selection */
+        .verse-selection {
+            background: linear-gradient(135deg, var(--orange), var(--red));
+            border-radius: 25px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .selection-label {
+            color: var(--white);
+            font-size: 1.6em;
+            margin-bottom: 20px;
+            font-weight: 700;
+            display: block;
+            text-align: center;
+        }
+
+        .verse-input-group {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .verse-input {
+            padding: 20px;
+            font-size: 1.3em;
+            border: 3px solid var(--white);
+            border-radius: 15px;
+            font-family: 'Fredoka', sans-serif;
+            font-weight: 600;
+        }
+
+        .verse-input:focus {
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(253, 255, 252, 0.3);
+        }
+
+        /* Popular Verses */
+        .popular-verses {
+            background: var(--midnight);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+
+        .popular-title {
+            color: var(--white);
+            font-size: 1.4em;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 700;
+        }
+
+        .verse-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .verse-option {
+            background: var(--teal);
+            color: var(--white);
+            padding: 15px 20px;
+            border-radius: 15px;
+            border: none;
+            font-size: 1.3em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Fredoka', sans-serif;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .verse-option:hover {
+            background: var(--orange);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .verse-option:active {
+            transform: translateY(0);
+        }
+
+        /* Loading State */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            font-size: 2em;
+            color: var(--teal);
+        }
+
+        .spinner {
+            border: 5px solid var(--white);
+            border-top: 5px solid var(--teal);
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Error Message */
+        .error-message {
+            background: var(--red);
+            color: var(--white);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            font-size: 1.3em;
+            font-weight: 600;
+            text-align: center;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+            animation: shake 0.5s;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        /* Game Stats */
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 30px;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .stat-box {
+            background: linear-gradient(135deg, var(--teal), var(--midnight));
+            color: var(--white);
+            padding: 20px 40px;
+            border-radius: 20px;
+            font-size: 1.6em;
+            font-weight: 600;
+            min-width: 200px;
+            text-align: center;
+            box-shadow: 0 8px 20px rgba(46, 196, 182, 0.4);
+            transition: transform 0.2s;
+        }
+
+        .stat-box:hover {
+            transform: scale(1.05);
+        }
+
+        .stat-label {
+            font-size: 0.7em;
+            opacity: 0.9;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-size: 1.5em;
+            font-weight: 700;
+        }
+
+        .verse-reference {
+            font-size: 1.8em;
+            color: var(--red);
+            font-weight: 700;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .verse-container {
+            background: linear-gradient(135deg, rgba(46, 196, 182, 0.1), rgba(255, 159, 28, 0.1));
+            border-radius: 30px;
+            padding: 50px;
+            margin-bottom: 30px;
+            min-height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 5px solid var(--teal);
+        }
+
+        .verse-words {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+            font-size: 2.5em;
+            line-height: 1.6;
+        }
+
+        .word {
+            padding: 15px 25px;
+            border-radius: 15px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            user-select: none;
+            position: relative;
+        }
+
+        .word.visible {
+            background: rgba(46, 196, 182, 0.3);
+            color: var(--midnight);
+        }
+
+        .word.hidden {
+            background: var(--orange);
+            color: transparent;
+            box-shadow: 0 5px 15px rgba(255, 159, 28, 0.5);
+            animation: pulse 2s infinite;
+        }
+
+        .word.hidden:hover {
+            transform: scale(1.1);
+            box-shadow: 0 8px 25px rgba(255, 159, 28, 0.7);
+        }
+
+        .word.hidden:active {
+            transform: scale(0.95);
+        }
+
+        .word.revealed {
+            background: var(--red);
+            color: var(--white);
+            animation: reveal 0.5s ease;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @keyframes reveal {
+            0% { transform: scale(0.8); opacity: 0; }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .word.hidden::after {
+            content: '?';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: var(--white);
+            font-size: 1.2em;
+            font-weight: 700;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 20px 50px;
+            font-size: 1.8em;
+            font-weight: 700;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Fredoka', sans-serif;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            min-width: 220px;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--teal), var(--midnight));
+            color: var(--white);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, var(--orange), var(--red));
+            color: var(--white);
+        }
+
+        .btn-danger {
+            background: var(--midnight);
+            color: var(--white);
+            border: 3px solid var(--red);
+        }
+
+        .instructions {
+            background: var(--orange);
+            border: 4px solid var(--red);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 30px;
+            font-size: 1.6em;
+            text-align: center;
+            color: var(--white);
+            font-weight: 600;
+        }
+
+        .level-complete {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            background: var(--white);
+            padding: 60px;
+            border-radius: 40px;
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.4);
+            text-align: center;
+            z-index: 1000;
+            transition: transform 0.5s ease;
+            border: 5px solid var(--teal);
+        }
+
+        .level-complete.show {
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .level-complete h2 {
+            font-size: 3.5em;
+            color: var(--teal);
+            margin-bottom: 20px;
+            font-family: 'Bubblegum Sans', cursive;
+        }
+
+        .level-complete p {
+            font-size: 2em;
+            color: var(--midnight);
+            margin-bottom: 30px;
+        }
+
+        .stars {
+            font-size: 5em;
+            margin: 20px 0;
+            animation: sparkle 1s ease-in-out infinite;
+        }
+
+        @keyframes sparkle {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(1, 22, 39, 0.8);
+            z-index: 999;
+            display: none;
+        }
+
+        .overlay.show {
+            display: block;
+        }
+
+        @media (max-width: 1200px) {
+            .verse-words {
+                font-size: 2em;
+            }
+            
+            .title {
+                font-size: 2.5em;
+            }
+
+            .verse-input-group {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Fireworks Animation */
+        .fireworks {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        .firework {
+            position: absolute;
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            animation: explode 1s ease-out forwards;
+        }
+
+        @keyframes explode {
+            0% {
+                transform: translate(0, 0) scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(var(--tx), var(--ty)) scale(0);
+                opacity: 0;
+            }
+        }
+
+        /* Walking Animal */
+        .walking-animal {
+            position: fixed;
+            bottom: 0;
+            left: -150px;
+            width: 100px;
+            height: 100px;
+            font-size: 80px;
+            animation: walkAcross 8s linear forwards;
+            z-index: 9998;
+        }
+
+        @keyframes walkAcross {
+            0% {
+                left: -150px;
+                transform: scaleX(1);
+            }
+            100% {
+                left: calc(100% + 150px);
+                transform: scaleX(1);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Selection Screen -->
+        <div class="selection-screen" id="selectionScreen">
+            <div class="header">
+                <h1 class="title">📖 Bible Verse Memory Game 📖</h1>
+                <div class="subtitle">Choose Your Verse!</div>
+            </div>
+
+            <div class="error-message" id="errorMessage"></div>
+
+            <div class="verse-selection">
+                <label class="selection-label">Enter Bible Reference:</label>
+                <div class="verse-input-group">
+                    <input 
+                        type="text" 
+                        id="bookInput" 
+                        class="verse-input" 
+                        placeholder="Book (e.g., John, Genesis)"
+                    >
+                    <input 
+                        type="number" 
+                        id="chapterInput" 
+                        class="verse-input" 
+                        placeholder="Chapter"
+                        min="1"
+                    >
+                    <input 
+                        type="text" 
+                        id="verseInput" 
+                        class="verse-input" 
+                        placeholder="Verse(s)"
+                    >
+                </div>
+                <button class="btn btn-primary" id="loadVerseBtn">Load Verse & Start Game! 🎮</button>
+            </div>
+
+            <div class="popular-verses">
+                <div class="popular-title">Or Choose a Popular Memory Verse:</div>
+                <div class="verse-grid">
+                    <button class="verse-option" data-ref="JHN.3.16">John 3:16</button>
+                    <button class="verse-option" data-ref="JHN.13.34">John 13:34</button>
+                    <button class="verse-option" data-ref="PHP.4.13">Philippians 4:13</button>
+                    <button class="verse-option" data-ref="JER.29.11">Jeremiah 29:11</button>
+                    <button class="verse-option" data-ref="PSA.23.1">Psalm 23:1</button>
+                    <button class="verse-option" data-ref="PRO.3.5-6">Proverbs 3:5-6</button>
+                    <button class="verse-option" data-ref="ROM.8.28">Romans 8:28</button>
+                    <button class="verse-option" data-ref="ISA.40.31">Isaiah 40:31</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Game Screen -->
+        <div class="game-screen" id="gameScreen">
+            <div class="header">
+                <h1 class="title">📖 Bible Verse Memory Game 📖</h1>
+                <div class="verse-reference" id="verseReference"></div>
+            </div>
+
+            <div class="instructions">
+                Tap the orange boxes to see the words! Try to say the whole verse without clicking! 🌟
+            </div>
+
+            <div class="stats">
+                <div class="stat-box">
+                    <div class="stat-label">Level</div>
+                    <div class="stat-value" id="level">1</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Score</div>
+                    <div class="stat-value" id="score">100</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Words Left</div>
+                    <div class="stat-value" id="wordsLeft">0</div>
+                </div>
+            </div>
+
+            <div class="verse-container">
+                <div class="verse-words" id="verseWords"></div>
+            </div>
+
+            <div class="controls">
+                <button class="btn btn-primary" id="nextLevel">Next Level ➜</button>
+                <button class="btn btn-secondary" id="tryAgain">Try Again 🔄</button>
+                <button class="btn btn-danger" id="changeVerse">Change Verse 📖</button>
+            </div>
+        </div>
+
+        <div class="loading" id="loading" style="display: none;">
+            <div class="spinner"></div>
+            Loading verse...
+        </div>
+    </div>
+
+    <div class="overlay" id="overlay"></div>
+    <div class="level-complete" id="levelComplete">
+        <div class="stars">⭐⭐⭐</div>
+        <h2>Amazing Job!</h2>
+        <p>You completed Level <span id="completedLevel"></span>!</p>
+        <p>Your Score: <span id="finalScore"></span> points</p>
+        <button class="btn btn-primary" id="continueBtn">Continue! 🎉</button>
+    </div>
+
+    <!-- Fireworks Container -->
+    <div id="fireworksContainer" class="fireworks"></div>
+
+    <!-- Walking Animal -->
+    <div id="walkingAnimal" class="walking-animal" style="display: none;"></div>
+
+    <script>
+        // API Configuration
+        const DEFAULT_BIBLE_ID = '78a9f6124f344018-01'; // NIV   
+        // 06125adad2d5898a-01 = World English Bible
+        const API_KEY = 'Fo3jWbgd_jopCVaJ5SZ1l'; // Replace with your API key from scripture.api.bible
+        
+        // Game state
+        let verseText = '';
+        let words = [];
+        let currentLevel = 1;
+        let currentScore = 100;
+        let hiddenWords = [];
+        let revealedWords = new Set();
+        let currentVerseReference = '';
+        
+        // Level configurations
+        const levelConfigs = [
+            { hiddenIndices: [], description: "Learn the verse!" },
+            { hiddenIndices: [0, 4, 8, 12, 16, 20], description: "6 words hidden" },
+            { hiddenIndices: [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22], description: "12 words hidden" },
+            { hiddenIndices: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18], description: "Almost all hidden!" },
+            { hiddenIndices: Array.from({length: 50}, (_, i) => i), description: "All words hidden!" }
+        ];
+
+        // Book abbreviation mapping
+        const bookAbbreviations = {
+            'genesis': 'GEN', 'gen': 'GEN',
+            'exodus': 'EXO', 'exo': 'EXO',
+            'leviticus': 'LEV', 'lev': 'LEV',
+            'numbers': 'NUM', 'num': 'NUM',
+            'deuteronomy': 'DEU', 'deu': 'DEU', 'deut': 'DEU',
+            'joshua': 'JOS', 'josh': 'JOS',
+            'judges': 'JDG', 'judg': 'JDG',
+            'ruth': 'RUT',
+            '1 samuel': '1SA', '1samuel': '1SA', '1 sam': '1SA', '1sam': '1SA',
+            '2 samuel': '2SA', '2samuel': '2SA', '2 sam': '2SA', '2sam': '2SA',
+            '1 kings': '1KI', '1kings': '1KI',
+            '2 kings': '2KI', '2kings': '2KI',
+            'psalms': 'PSA', 'psalm': 'PSA', 'psa': 'PSA', 'ps': 'PSA',
+            'proverbs': 'PRO', 'prov': 'PRO',
+            'isaiah': 'ISA', 'isa': 'ISA',
+            'jeremiah': 'JER', 'jer': 'JER',
+            'matthew': 'MAT', 'matt': 'MAT', 'mat': 'MAT',
+            'mark': 'MRK',
+            'luke': 'LUK',
+            'john': 'JHN', 'jhn': 'JHN',
+            'acts': 'ACT',
+            'romans': 'ROM', 'rom': 'ROM',
+            'philippians': 'PHP', 'phil': 'PHP',
+            '1 corinthians': '1CO', '1corinthians': '1CO', '1 cor': '1CO', '1cor': '1CO',
+            '2 corinthians': '2CO', '2corinthians': '2CO', '2 cor': '2CO', '2cor': '2CO',
+            'galatians': 'GAL', 'gal': 'GAL',
+            'ephesians': 'EPH', 'eph': 'EPH',
+            'colossians': 'COL', 'col': 'COL',
+            '1 thessalonians': '1TH', '1thessalonians': '1TH', '1 thess': '1TH', '1thess': '1TH',
+            '2 thessalonians': '2TH', '2thessalonians': '2TH', '2 thess': '2TH', '2thess': '2TH',
+            '1 timothy': '1TI', '1timothy': '1TI', '1 tim': '1TI', '1tim': '1TI',
+            '2 timothy': '2TI', '2timothy': '2TI', '2 tim': '2TI', '2tim': '2TI',
+            'hebrews': 'HEB', 'heb': 'HEB',
+            'james': 'JAS', 'jas': 'JAS',
+            '1 peter': '1PE', '1peter': '1PE', '1 pet': '1PE', '1pet': '1PE',
+            '2 peter': '2PE', '2peter': '2PE', '2 pet': '2PE', '2pet': '2PE',
+            '1 john': '1JN', '1john': '1JN',
+            '2 john': '2JN', '2john': '2JN',
+            '3 john': '3JN', '3john': '3JN',
+            'revelation': 'REV', 'rev': 'REV'
+        };
+
+        // Initialize event listeners
+        document.getElementById('loadVerseBtn').addEventListener('click', loadCustomVerse);
+        document.querySelectorAll('.verse-option').forEach(btn => {
+            btn.addEventListener('click', (e) => loadVerseByRef(e.target.dataset.ref));
+        });
+        document.getElementById('nextLevel').addEventListener('click', handleNextLevel);
+        document.getElementById('tryAgain').addEventListener('click', tryAgain);
+        document.getElementById('changeVerse').addEventListener('click', changeVerse);
+        document.getElementById('continueBtn').addEventListener('click', continueToNextLevel);
+
+        // API Functions
+        async function fetchVerse(verseId) {
+            if (!API_KEY || API_KEY === 'API_KEY') {
+                showError('API key not configured. Please add your API key to the code.');
+                return null;
+            }
+
+            showLoading(true);
+
+            try {
+                const response = await fetch(
+                    `https://rest.api.bible/v1/bibles/${DEFAULT_BIBLE_ID}/verses/${verseId}?content-type=html&include-notes=false&include-titles=true&include-chapter-numbers=false&include-verse-numbers=false&include-verse-spans=false&use-org-id=false`,
+                    {
+                        headers: {
+                            'api-key': API_KEY
+                        }
+                    }
+                );
+
+                if (!response.ok) {
+                    throw new Error(`API Error: ${response.status}`);
+                }
+
+                const data = await response.json();
+                showLoading(false);
+                return data.data;
+            } catch (error) {
+                showLoading(false);
+                showError(`Error loading verse: ${error.message}. Make sure your API key is correct.`);
+                return null;
+            }
+        }
+
+        function convertToVerseId(book, chapter, verse) {
+            const bookKey = book.toLowerCase().trim();
+            const bookCode = bookAbbreviations[bookKey];
+            
+            if (!bookCode) {
+                showError(`Book "${book}" not recognized. Try using the full name like "John" or "Genesis"`);
+                return null;
+            }
+
+            return `${bookCode}.${chapter}.${verse}`;
+        }
+
+        async function loadCustomVerse() {
+            const book = document.getElementById('bookInput').value.trim();
+            const chapter = document.getElementById('chapterInput').value.trim();
+            const verse = document.getElementById('verseInput').value.trim();
+
+            if (!book || !chapter || !verse) {
+                showError('Please enter a book, chapter, and verse number');
+                return;
+            }
+
+            const verseId = convertToVerseId(book, chapter, verse);
+            if (!verseId) return;
+
+            await loadVerseByRef(verseId);
+        }
+
+        async function loadVerseByRef(verseRef) {
+            const verseData = await fetchVerse(verseRef);
+            if (!verseData) return;
+
+            // Extract text and clean it
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = verseData.content;
+            verseText = tempDiv.textContent.trim();
+            
+            // Remove verse numbers and extra whitespace
+            verseText = verseText.replace(/\[\d+\]/g, '').replace(/\s+/g, ' ').trim();
+            
+            currentVerseReference = verseData.reference;
+            words = verseText.split(' ');
+
+            // Start game
+            startGame();
+        }
+
+        function startGame() {
+            document.getElementById('selectionScreen').classList.add('hidden');
+            document.getElementById('gameScreen').classList.add('active');
+            document.getElementById('verseReference').textContent = currentVerseReference;
+            
+            currentLevel = 1;
+            currentScore = 100;
+            initGame();
+        }
+
+        function changeVerse() {
+            document.getElementById('gameScreen').classList.remove('active');
+            document.getElementById('selectionScreen').classList.remove('hidden');
+            
+            // Reset inputs
+            document.getElementById('bookInput').value = '';
+            document.getElementById('chapterInput').value = '';
+            document.getElementById('verseInput').value = '';
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.textContent = message;
+            errorDiv.classList.add('show');
+            setTimeout(() => {
+                errorDiv.classList.remove('show');
+            }, 5000);
+        }
+
+        function showLoading(show) {
+            document.getElementById('loading').style.display = show ? 'block' : 'none';
+        }
+
+        // Game Functions
+        function initGame() {
+            renderVerse();
+            updateStats();
+        }
+
+        function renderVerse() {
+            const container = document.getElementById('verseWords');
+            container.innerHTML = '';
+            
+            const config = levelConfigs[Math.min(currentLevel - 1, levelConfigs.length - 1)];
+            hiddenWords = config.hiddenIndices.slice(0, words.length);
+            revealedWords.clear();
+            
+            words.forEach((word, index) => {
+                const wordSpan = document.createElement('span');
+                wordSpan.textContent = word;
+                wordSpan.classList.add('word');
+                
+                if (hiddenWords.includes(index)) {
+                    wordSpan.classList.add('hidden');
+                    wordSpan.dataset.index = index;
+                    wordSpan.addEventListener('click', () => revealWord(wordSpan, index));
+                } else {
+                    wordSpan.classList.add('visible');
+                }
+                
+                container.appendChild(wordSpan);
+            });
+            
+            updateWordsLeft();
+            
+            // Update button text based on level
+            const nextLevelBtn = document.getElementById('nextLevel');
+            if (currentLevel >= levelConfigs.length) {
+                nextLevelBtn.textContent = 'Verse Memorized Correctly! 🎉';
+            } else {
+                nextLevelBtn.textContent = 'Next Level ➡️';
+            }
+        }
+
+        function revealWord(wordSpan, index) {
+            if (revealedWords.has(index)) return;
+            
+            wordSpan.classList.remove('hidden');
+            wordSpan.classList.add('revealed');
+            revealedWords.add(index);
+            
+            currentScore = Math.max(0, currentScore - 5);
+            updateStats();
+            
+            wordSpan.style.animation = 'none';
+            setTimeout(() => {
+                wordSpan.style.animation = '';
+            }, 10);
+        }
+
+        function updateStats() {
+            document.getElementById('level').textContent = currentLevel;
+            document.getElementById('score').textContent = currentScore;
+            updateWordsLeft();
+        }
+
+        function updateWordsLeft() {
+            const wordsLeft = hiddenWords.length - revealedWords.size;
+            document.getElementById('wordsLeft').textContent = wordsLeft;
+        }
+
+        function showLevelComplete() {
+            document.getElementById('completedLevel').textContent = currentLevel;
+            document.getElementById('finalScore').textContent = currentScore;
+            document.getElementById('overlay').classList.add('show');
+            document.getElementById('levelComplete').classList.add('show');
+        }
+
+        function hideLevelComplete() {
+            document.getElementById('overlay').classList.remove('show');
+            document.getElementById('levelComplete').classList.remove('show');
+        }
+
+        function handleNextLevel() {
+            if (currentLevel < levelConfigs.length) {
+                showLevelComplete();
+            } else {
+                // Last level completed - trigger celebration!
+                showFinalCelebration();
+            }
+        }
+
+        function continueToNextLevel() {
+            hideLevelComplete();
+            currentLevel++;
+            currentScore = 100;
+            renderVerse();
+            updateStats();
+            
+            if (currentLevel > levelConfigs.length) {
+                alert('🎊 Amazing! You finished the entire game! 🎊');
+                currentLevel = 1;
+                currentScore = 100;
+                renderVerse();
+                updateStats();
+            }
+        }
+
+        function tryAgain() {
+            currentScore = 100;
+            revealedWords.clear();
+            renderVerse();
+            updateStats();
+        }
+
+        // Final Celebration Functions
+        function showFinalCelebration() {
+            // Show the level complete modal first
+            showLevelComplete();
+            
+            // Trigger fireworks
+            setTimeout(() => {
+                launchFireworks();
+            }, 500);
+            
+            // Show walking animal
+            setTimeout(() => {
+                showWalkingAnimal();
+            }, 1000);
+        }
+
+        function launchFireworks() {
+            const container = document.getElementById('fireworksContainer');
+            const colors = ['#2ec4b6', '#ff9f1c', '#e71d36', '#fdfffc'];
+            
+            // Launch 15 fireworks
+            for (let i = 0; i < 15; i++) {
+                setTimeout(() => {
+                    createFirework(container, colors);
+                }, i * 300);
+            }
+        }
+
+        function createFirework(container, colors) {
+            const x = Math.random() * window.innerWidth;
+            const y = Math.random() * (window.innerHeight * 0.5);
+            
+            // Create 20 particles per firework
+            for (let i = 0; i < 20; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'firework';
+                particle.style.left = x + 'px';
+                particle.style.top = y + 'px';
+                particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                
+                const angle = (Math.PI * 2 * i) / 20;
+                const velocity = 50 + Math.random() * 100;
+                const tx = Math.cos(angle) * velocity;
+                const ty = Math.sin(angle) * velocity;
+                
+                particle.style.setProperty('--tx', tx + 'px');
+                particle.style.setProperty('--ty', ty + 'px');
+                
+                container.appendChild(particle);
+                
+                // Remove particle after animation
+                setTimeout(() => {
+                    particle.remove();
+                }, 1000);
+            }
+        }
+
+        function showWalkingAnimal() {
+            const animals = ['🐕', '🐈', '🐇', '🦊', '🐿️', '🦁', '🐯', '🐻'];
+            const animal = document.getElementById('walkingAnimal');
+            animal.textContent = animals[Math.floor(Math.random() * animals.length)];
+            animal.style.display = 'block';
+            
+            // Hide after animation completes
+            setTimeout(() => {
+                animal.style.display = 'none';
+            }, 8000);
+        }
+    </script>
+</body>
+</html>

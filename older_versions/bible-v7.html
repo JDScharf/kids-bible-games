@@ -1228,22 +1228,12 @@ function createFirework(container, colors) {
 }
 
 function showWalkingAnimal() {
-    const animalGifs = [
-        'https://media.giphy.com/media/RLOTE6CLOcCWBv5POp/giphy.gif',
-        'https://media.giphy.com/media/sandiegozoo-nk2C49mUNljb1scZgY/giphy.gif',
-        'https://media.giphy.com/media/fancy-cat-funny-VlchmIoZPjjYQ/giphy.gif',
-        'https://media.giphy.com/media/dog-walk-nBgH1BhsX0qje/giphy.gif',
-                'https://media.giphy.com/media/animated-bird-TBmdZGucMuy5O/giphy.gif',
-        'https://media.giphy.com/media/dog-pomeranian-pom-bREiLZWGym93rCHjjj/giphy.gif',
-    ];
-    
+    const animals = ['🐕', '🐈', '🐇', '🦊', '🐿️', '🦁', '🐯', '🐻'];
     const animal = document.getElementById('walkingAnimal');
-    const randomGif = animalGifs[Math.floor(Math.random() * animalGifs.length)];
-    
-    // Change to use an img tag instead of text
-    animal.innerHTML = `<img src="${randomGif}" style="width: 150px; height: 150px; object-fit: contain;">`;
+    animal.textContent = animals[Math.floor(Math.random() * animals.length)];
     animal.style.display = 'block';
     
+    // Hide after animation completes
     setTimeout(() => {
         animal.style.display = 'none';
     }, 8000);

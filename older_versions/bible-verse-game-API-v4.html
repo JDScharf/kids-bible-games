@@ -129,11 +129,6 @@
             margin-bottom: 20px;
         }
 
-        /* Book input autocomplete container */
-        .book-input-container {
-            position: relative;
-        }
-
         .verse-input {
             padding: 20px;
             font-size: 1.3em;
@@ -141,53 +136,11 @@
             border-radius: 15px;
             font-family: 'Fredoka', sans-serif;
             font-weight: 600;
-            width: 100%;
         }
 
         .verse-input:focus {
             outline: none;
             box-shadow: 0 0 0 4px rgba(253, 255, 252, 0.3);
-        }
-
-        /* Dropdown for book suggestions */
-        .book-dropdown {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            right: 0;
-            background: var(--white);
-            border: 3px solid var(--teal);
-            border-radius: 15px;
-            max-height: 300px;
-            overflow-y: auto;
-            z-index: 100;
-            margin-top: 5px;
-            display: none;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-        }
-
-        .book-dropdown.show {
-            display: block;
-        }
-
-        .book-option {
-            padding: 15px 20px;
-            cursor: pointer;
-            font-size: 1.2em;
-            font-weight: 600;
-            color: var(--midnight);
-            transition: all 0.2s;
-            border-bottom: 2px solid rgba(46, 196, 182, 0.2);
-        }
-
-        .book-option:last-child {
-            border-bottom: none;
-        }
-
-        .book-option:hover,
-        .book-option.selected {
-            background: var(--teal);
-            color: var(--white);
         }
 
         /* Popular Verses */
@@ -283,9 +236,179 @@
             75% { transform: translateX(10px); }
         }
 
-                        .instructions {
-            background: linear-gradient(135deg, var(--teal), var(--orange));
-            border: 4px solid var(--midnight);
+        /* Game Stats */
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 30px;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .stat-box {
+            background: linear-gradient(135deg, var(--teal), var(--midnight));
+            color: var(--white);
+            padding: 20px 40px;
+            border-radius: 20px;
+            font-size: 1.6em;
+            font-weight: 600;
+            min-width: 200px;
+            text-align: center;
+            box-shadow: 0 8px 20px rgba(46, 196, 182, 0.4);
+            transition: transform 0.2s;
+        }
+
+        .stat-box:hover {
+            transform: scale(1.05);
+        }
+
+        .stat-label {
+            font-size: 0.7em;
+            opacity: 0.9;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-size: 1.5em;
+            font-weight: 700;
+        }
+
+        .verse-reference {
+            font-size: 1.8em;
+            color: var(--red);
+            font-weight: 700;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .verse-container {
+            background: linear-gradient(135deg, rgba(46, 196, 182, 0.1), rgba(255, 159, 28, 0.1));
+            border-radius: 30px;
+            padding: 50px;
+            margin-bottom: 30px;
+            min-height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 5px solid var(--teal);
+        }
+
+        .verse-words {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+            font-size: 2.5em;
+            line-height: 1.6;
+        }
+
+        .word {
+            padding: 15px 25px;
+            border-radius: 15px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            user-select: none;
+            position: relative;
+        }
+
+        .word.visible {
+            background: rgba(46, 196, 182, 0.3);
+            color: var(--midnight);
+        }
+
+        .word.hidden {
+            background: var(--orange);
+            color: transparent;
+            box-shadow: 0 5px 15px rgba(255, 159, 28, 0.5);
+            animation: pulse 2s infinite;
+        }
+
+        .word.hidden:hover {
+            transform: scale(1.1);
+            box-shadow: 0 8px 25px rgba(255, 159, 28, 0.7);
+        }
+
+        .word.hidden:active {
+            transform: scale(0.95);
+        }
+
+        .word.revealed {
+            background: var(--red);
+            color: var(--white);
+            animation: reveal 0.5s ease;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @keyframes reveal {
+            0% { transform: scale(0.8); opacity: 0; }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .word.hidden::after {
+            content: '?';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: var(--white);
+            font-size: 1.2em;
+            font-weight: 700;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 20px 50px;
+            font-size: 1.8em;
+            font-weight: 700;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Fredoka', sans-serif;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            min-width: 220px;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--teal), var(--midnight));
+            color: var(--white);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, var(--orange), var(--red));
+            color: var(--white);
+        }
+
+        .btn-danger {
+            background: var(--midnight);
+            color: var(--white);
+            border: 3px solid var(--red);
+        }
+
+        .instructions {
+            background: var(--orange);
+            border: 4px solid var(--red);
             border-radius: 20px;
             padding: 25px;
             margin-bottom: 30px;
@@ -295,169 +418,19 @@
             font-weight: 600;
         }
 
-        /* Game Stats */
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-
-        .stat-card {
-            background: linear-gradient(135deg, var(--teal), var(--orange));
-            border-radius: 20px;
-            padding: 20px;
-            text-align: center;
-            color: var(--white);
-        }
-
-        .stat-label {
-            font-size: 1.2em;
-            font-weight: 600;
-            margin-bottom: 10px;
-        }
-
-        .stat-value {
-            font-size: 2.5em;
-            font-weight: 700;
-            font-family: 'Bubblegum Sans', cursive;
-        }
-
-        /* Verse Display */
-        .verse-display {
-            background: var(--midnight);
-            border-radius: 25px;
-            padding: 40px;
-            margin-bottom: 30px;
-            min-height: 300px;
-        }
-
-        .verse-reference {
-            color: var(--orange);
-            font-size: 1.5em;
-            font-weight: 700;
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .verse-text {
-            color: var(--white);
-            font-size: 1.8em;
-            line-height: 1.8;
-            text-align: center;
-            font-weight: 600;
-        }
-
-        .word {
-            display: inline-block;
-            margin: 5px;
-            padding: 10px 15px;
-            border-radius: 12px;
-            transition: all 0.3s;
-        }
-
-        .word.visible {
-            color: var(--white);
-            background: transparent;
-        }
-
-        .word.hidden {
-            background: var(--teal);
-            color: transparent;
-            cursor: pointer;
-            user-select: none;
-        }
-
-        .word.hidden:hover {
-            background: var(--orange);
-            transform: scale(1.1);
-        }
-
-        .word.revealed {
-            background: var(--red);
-            color: var(--white);
-            animation: revealPop 0.5s;
-        }
-
-        @keyframes revealPop {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.2); }
-            100% { transform: scale(1); }
-        }
-
-        /* Game Controls */
-        .game-controls {
-            display: flex;
-            gap: 20px;
-            justify-content: center;
-        }
-
-        .btn {
-            padding: 20px 40px;
-            font-size: 1.5em;
-            font-weight: 700;
-            border: none;
-            border-radius: 20px;
-            cursor: pointer;
-            font-family: 'Fredoka', sans-serif;
-            transition: all 0.3s;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-        }
-
-        .btn-primary {
-            background: var(--teal);
-            color: var(--white);
-        }
-
-        .btn-primary:hover {
-            background: var(--orange);
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
-        }
-
-        .btn-secondary {
-            background: var(--orange);
-            color: var(--white);
-        }
-
-        .btn-secondary:hover {
-            background: var(--red);
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
-        }
-
-        .btn:active {
-            transform: translateY(0);
-        }
-
-        /* Level Complete Modal */
-        .overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(1, 22, 39, 0.9);
-            display: none;
-            z-index: 1000;
-        }
-
-        .overlay.show {
-            display: block;
-        }
-
         .level-complete {
             position: fixed;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%) scale(0);
             background: var(--white);
-            border-radius: 40px;
             padding: 60px;
+            border-radius: 40px;
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.4);
             text-align: center;
-            z-index: 1001;
-            transition: transform 0.3s;
-            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            transition: transform 0.5s ease;
+            border: 5px solid var(--teal);
         }
 
         .level-complete.show {
@@ -465,24 +438,49 @@
         }
 
         .level-complete h2 {
-            font-family: 'Bubblegum Sans', cursive;
-            font-size: 3em;
+            font-size: 3.5em;
             color: var(--teal);
             margin-bottom: 20px;
+            font-family: 'Bubblegum Sans', cursive;
         }
 
         .level-complete p {
-            font-size: 1.8em;
+            font-size: 2em;
             color: var(--midnight);
             margin-bottom: 30px;
-            font-weight: 600;
         }
 
-        @media (max-width: 768px) {
-            .container {
-                padding: 30px;
-            }
+        .stars {
+            font-size: 5em;
+            margin: 20px 0;
+            animation: sparkle 1s ease-in-out infinite;
+        }
 
+        @keyframes sparkle {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(1, 22, 39, 0.8);
+            z-index: 999;
+            display: none;
+        }
+
+        .overlay.show {
+            display: block;
+        }
+
+        @media (max-width: 1200px) {
+            .verse-words {
+                font-size: 2em;
+            }
+            
             .title {
                 font-size: 2.5em;
             }
@@ -490,17 +488,9 @@
             .verse-input-group {
                 grid-template-columns: 1fr;
             }
-
-            .stats {
-                grid-template-columns: 1fr;
-            }
-
-            .game-controls {
-                flex-direction: column;
-            }
         }
 
-               /* Rickroll Modal Styles */
+        /* Rickroll Modal Styles */
         .rickroll-modal {
             max-width: 700px;
         }
@@ -517,100 +507,48 @@
                 height: 200px;
             }
         }
-
-/* Fireworks Animation */
-.fireworks {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    z-index: 9999;
-}
-
-.firework {
-    position: absolute;
-    width: 5px;
-    height: 5px;
-    border-radius: 50%;
-    animation: explode 1s ease-out forwards;
-}
-
-@keyframes explode {
-    0% {
-        transform: translate(0, 0) scale(1);
-        opacity: 1;
-    }
-    100% {
-        transform: translate(var(--tx), var(--ty)) scale(0);
-        opacity: 0;
-    }
-}
-
-/* Walking Animal */
-.walking-animal {
-    position: fixed;
-    bottom: 0;
-    left: -150px;
-    width: 100px;
-    height: 100px;
-    font-size: 80px;
-    animation: walkAcross 8s linear forwards;
-    z-index: 9998;
-}
-
-@keyframes walkAcross {
-    0% {
-        left: -150px;
-        transform: scaleX(1);
-    }
-    100% {
-        left: calc(100% + 150px);
-        transform: scaleX(1);
-    }
-}
     </style>
 </head>
 <body>
     <div class="container">
         <!-- Selection Screen -->
-        <div id="selectionScreen" class="selection-screen">
+        <div class="selection-screen" id="selectionScreen">
             <div class="header">
-                <h1 class="title">📖 Kid Life - Bible Memory Game</h1>
-                <p class="subtitle">Choose your verse and start memorizing!</p>
+                <h1 class="title">📖 Bible Verse Memory Game 📖</h1>
+                <div class="subtitle">Choose Your Verse!</div>
             </div>
 
-            <div id="errorMessage" class="error-message"></div>
-            <div id="loading" class="loading" style="display: none;">
-                <div class="spinner"></div>
-                <p>Loading verse...</p>
-            </div>
+            <div class="error-message" id="errorMessage"></div>
 
             <div class="verse-selection">
-                <span class="selection-label">🔍 Search for a Verse</span>
+                <label class="selection-label">Enter Bible Reference:</label>
                 <div class="verse-input-group">
-                    <div class="book-input-container">
-                        <input 
-                            type="text" 
-                            id="bookInput" 
-                            class="verse-input" 
-                            placeholder="Book (e.g., John)" 
-                            autocomplete="off"
-                        >
-                        <div id="bookDropdown" class="book-dropdown"></div>
-                    </div>
-                    <input type="number" id="chapterInput" class="verse-input" placeholder="Chapter" min="1">
-                    <input type="number" id="verseInput" class="verse-input" placeholder="Verse" min="1">
+                    <input 
+                        type="text" 
+                        id="bookInput" 
+                        class="verse-input" 
+                        placeholder="Book (e.g., John, Genesis)"
+                    >
+                    <input 
+                        type="number" 
+                        id="chapterInput" 
+                        class="verse-input" 
+                        placeholder="Chapter"
+                        min="1"
+                    >
+                    <input 
+                        type="text" 
+                        id="verseInput" 
+                        class="verse-input" 
+                        placeholder="Verse(s)"
+                    >
                 </div>
-                <button id="loadVerseBtn" class="btn btn-primary" style="width: 100%; margin-top: 10px;">
-                    🎮 Load This Verse & Start Game
-                </button>
+                <button class="btn btn-primary" id="loadVerseBtn">Load Verse & Start Game! 🎮</button>
             </div>
 
             <div class="popular-verses">
-                <h3 class="popular-title">⭐ Or Choose a Popular Memory Verse:</h3>
-                 <div class="verse-grid">
+                <div class="popular-title">Or Choose a Popular Memory Verse:</div>
+                <div class="verse-grid">
                     <button class="verse-option" data-ref="JHN.3.16">John 3:16</button>
                     <button class="verse-option" data-ref="JHN.13.34">John 13:34</button>
                     <button class="verse-option" data-ref="PHP.4.13">Philippians 4:13</button>
@@ -624,57 +562,62 @@
         </div>
 
         <!-- Game Screen -->
-        <div id="gameScreen" class="game-screen">
+        <div class="game-screen" id="gameScreen">
             <div class="header">
-                <h1 class="title">📖 Kid Life - Bible Memory Game</h1>
+                <h1 class="title">📖 Bible Verse Memory Game 📖</h1>
+                <div class="verse-reference" id="verseReference"></div>
             </div>
 
             <div class="instructions">
-                Tap the orange boxes to see the words. Try to say the whole verse without clicking! 🌟
+                Tap the orange boxes to see the words! Try to say the whole verse without clicking! 🌟
             </div>
 
             <div class="stats">
-                <div class="stat-card">
+                <div class="stat-box">
                     <div class="stat-label">Level</div>
                     <div class="stat-value" id="level">1</div>
                 </div>
-                <div class="stat-card">
+                <div class="stat-box">
                     <div class="stat-label">Score</div>
                     <div class="stat-value" id="score">100</div>
                 </div>
-                <div class="stat-card">
+                <div class="stat-box">
                     <div class="stat-label">Words Left</div>
                     <div class="stat-value" id="wordsLeft">0</div>
                 </div>
             </div>
 
-            <div class="verse-display">
-                <div id="verseReference" class="verse-reference"></div>
-                <div id="verseWords" class="verse-text"></div>
+            <div class="verse-container">
+                <div class="verse-words" id="verseWords"></div>
             </div>
 
-            <div class="game-controls">
-                <button id="nextLevel" class="btn btn-primary">Next Level ➡️</button>
-                <button id="tryAgain" class="btn btn-secondary">Try Again 🔄</button>
-                <button id="changeVerse" class="btn btn-secondary">Change Verse 📖</button>
+            <div class="controls">
+                <button class="btn btn-primary" id="nextLevel">Next Level ➜</button>
+                <button class="btn btn-secondary" id="tryAgain">Try Again 🔄</button>
+                <button class="btn btn-danger" id="changeVerse">Change Verse 📖</button>
             </div>
         </div>
 
-        <!-- Level Complete Modal -->
-        <div id="overlay" class="overlay"></div>
-        <div id="levelComplete" class="level-complete">
-            <h2>🎉 Level Complete! 🎉</h2>
-            <p>You completed Level <span id="completedLevel">1</span>!</p>
-            <p>Final Score: <span id="finalScore">100</span></p>
-            <button id="continueBtn" class="btn btn-primary">Continue to Next Level</button>
+        <div class="loading" id="loading" style="display: none;">
+            <div class="spinner"></div>
+            Loading verse...
         </div>
     </div>
 
-    
+    <div class="overlay" id="overlay"></div>
+    <div class="level-complete" id="levelComplete">
+        <div class="stars">⭐⭐⭐</div>
+        <h2>Amazing Job!</h2>
+        <p>You completed Level <span id="completedLevel"></span>!</p>
+        <p>Your Score: <span id="finalScore"></span> points</p>
+        <button class="btn btn-primary" id="continueBtn">Continue! 🎉</button>
+    </div>
+
     <!-- Rickroll Modal -->
     <div class="overlay" id="rickrollOverlay"></div>
     <div class="level-complete rickroll-modal" id="rickrollModal">
         <h2>😱 Oh No! You're Out of Points! 😱</h2>
+        <p>You've been RICKROLLED! 🎵</p>
         <iframe 
             id="rickrollVideo"
             width="560" 
@@ -691,18 +634,12 @@
         </button>
     </div>
 
-    <!-- Fireworks Container -->
-<div id="fireworksContainer" class="fireworks"></div>
-
-<!-- Walking Animal -->
-<div id="walkingAnimal" class="walking-animal" style="display: none;"></div>
-
     <script>
-        // Replace with your actual API.Bible key
+        // API Configuration
         const DEFAULT_BIBLE_ID = '78a9f6124f344018-01'; // NIV   
         // 06125adad2d5898a-01 = World English Bible
         const API_KEY = 'Fo3jWbgd_jopCVaJ5SZ1l'; // Replace with your API key from scripture.api.bible
-
+        
         // Game state
         let verseText = '';
         let words = [];
@@ -711,93 +648,50 @@
         let hiddenWords = [];
         let revealedWords = new Set();
         let currentVerseReference = '';
-
+        
         // Level configurations
         const levelConfigs = [
             { hiddenIndices: [], description: "Learn the verse!" },
             { hiddenIndices: [0, 4, 8, 12, 16, 20], description: "6 words hidden" },
             { hiddenIndices: [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22], description: "12 words hidden" },
-            { hiddenIndices: [0, 1, 2, 4, 5, 6, 7, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 20,23,26], description: "Almost all hidden!" },
+            { hiddenIndices: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18], description: "Almost all hidden!" },
             { hiddenIndices: Array.from({length: 50}, (_, i) => i), description: "All words hidden!" }
         ];
 
-        // Bible books list for autocomplete
-        const bibleBooks = [
-            'Genesis', 'Exodus', 'Leviticus', 'Numbers', 'Deuteronomy',
-            'Joshua', 'Judges', 'Ruth', '1 Samuel', '2 Samuel',
-            '1 Kings', '2 Kings', '1 Chronicles', '2 Chronicles',
-            'Ezra', 'Nehemiah', 'Esther', 'Job', 'Psalms', 'Proverbs',
-            'Ecclesiastes', 'Song of Solomon', 'Isaiah', 'Jeremiah', 'Lamentations',
-            'Ezekiel', 'Daniel', 'Hosea', 'Joel', 'Amos',
-            'Obadiah', 'Jonah', 'Micah', 'Nahum', 'Habakkuk',
-            'Zephaniah', 'Haggai', 'Zechariah', 'Malachi',
-            'Matthew', 'Mark', 'Luke', 'John', 'Acts',
-            'Romans', '1 Corinthians', '2 Corinthians', 'Galatians', 'Ephesians',
-            'Philippians', 'Colossians', '1 Thessalonians', '2 Thessalonians',
-            '1 Timothy', '2 Timothy', 'Titus', 'Philemon', 'Hebrews',
-            'James', '1 Peter', '2 Peter', '1 John', '2 John',
-            '3 John', 'Jude', 'Revelation'
-        ];
-
-        // Book abbreviations mapping
+        // Book abbreviation mapping
         const bookAbbreviations = {
             'genesis': 'GEN', 'gen': 'GEN',
-            'exodus': 'EXO', 'exo': 'EXO', 'exod': 'EXO',
+            'exodus': 'EXO', 'exo': 'EXO',
             'leviticus': 'LEV', 'lev': 'LEV',
             'numbers': 'NUM', 'num': 'NUM',
-            'deuteronomy': 'DEU', 'deut': 'DEU', 'deu': 'DEU',
-            'joshua': 'JOS', 'josh': 'JOS', 'jos': 'JOS',
-            'judges': 'JDG', 'judg': 'JDG', 'jdg': 'JDG',
-            'ruth': 'RUT', 'rut': 'RUT',
+            'deuteronomy': 'DEU', 'deu': 'DEU', 'deut': 'DEU',
+            'joshua': 'JOS', 'josh': 'JOS',
+            'judges': 'JDG', 'judg': 'JDG',
+            'ruth': 'RUT',
             '1 samuel': '1SA', '1samuel': '1SA', '1 sam': '1SA', '1sam': '1SA',
             '2 samuel': '2SA', '2samuel': '2SA', '2 sam': '2SA', '2sam': '2SA',
-            '1 kings': '1KI', '1kings': '1KI', '1 ki': '1KI', '1ki': '1KI',
-            '2 kings': '2KI', '2kings': '2KI', '2 ki': '2KI', '2ki': '2KI',
-            '1 chronicles': '1CH', '1chronicles': '1CH', '1 chron': '1CH', '1chron': '1CH',
-            '2 chronicles': '2CH', '2chronicles': '2CH', '2 chron': '2CH', '2chron': '2CH',
-            'ezra': 'EZR', 'ezr': 'EZR',
-            'nehemiah': 'NEH', 'neh': 'NEH',
-            'esther': 'EST', 'est': 'EST',
-            'job': 'JOB',
+            '1 kings': '1KI', '1kings': '1KI',
+            '2 kings': '2KI', '2kings': '2KI',
             'psalms': 'PSA', 'psalm': 'PSA', 'psa': 'PSA', 'ps': 'PSA',
-            'proverbs': 'PRO', 'prov': 'PRO', 'pro': 'PRO',
-            'ecclesiastes': 'ECC', 'eccl': 'ECC', 'ecc': 'ECC',
-            'song of solomon': 'SNG', 'song': 'SNG', 'sos': 'SNG',
+            'proverbs': 'PRO', 'prov': 'PRO',
             'isaiah': 'ISA', 'isa': 'ISA',
             'jeremiah': 'JER', 'jer': 'JER',
-            'lamentations': 'LAM', 'lam': 'LAM',
-            'ezekiel': 'EZK', 'ezek': 'EZK', 'ezk': 'EZK',
-            'daniel': 'DAN', 'dan': 'DAN',
-            'hosea': 'HOS', 'hos': 'HOS',
-            'joel': 'JOL', 'joel': 'JOL',
-            'amos': 'AMO', 'amo': 'AMO',
-            'obadiah': 'OBA', 'obad': 'OBA', 'oba': 'OBA',
-            'jonah': 'JON', 'jon': 'JON',
-            'micah': 'MIC', 'mic': 'MIC',
-            'nahum': 'NAM', 'nah': 'NAM', 'nam': 'NAM',
-            'habakkuk': 'HAB', 'hab': 'HAB',
-            'zephaniah': 'ZEP', 'zeph': 'ZEP', 'zep': 'ZEP',
-            'haggai': 'HAG', 'hag': 'HAG',
-            'zechariah': 'ZEC', 'zech': 'ZEC', 'zec': 'ZEC',
-            'malachi': 'MAL', 'mal': 'MAL',
-            'matthew': 'MAT', 'matt': 'MAT', 'mat': 'MAT', 'mt': 'MAT',
-            'mark': 'MRK', 'mrk': 'MRk', 'mk': 'MRK',
-            'luke': 'LUK', 'luk': 'LUK', 'lk': 'LUK',
-            'john': 'JHN', 'jhn': 'JHN', 'jn': 'JHN',
-            'acts': 'ACT', 'act': 'ACT',
+            'matthew': 'MAT', 'matt': 'MAT', 'mat': 'MAT',
+            'mark': 'MRK',
+            'luke': 'LUK',
+            'john': 'JHN', 'jhn': 'JHN',
+            'acts': 'ACT',
             'romans': 'ROM', 'rom': 'ROM',
+            'philippians': 'PHP', 'phil': 'PHP',
             '1 corinthians': '1CO', '1corinthians': '1CO', '1 cor': '1CO', '1cor': '1CO',
             '2 corinthians': '2CO', '2corinthians': '2CO', '2 cor': '2CO', '2cor': '2CO',
             'galatians': 'GAL', 'gal': 'GAL',
             'ephesians': 'EPH', 'eph': 'EPH',
-            'philippians': 'PHP', 'phil': 'PHP', 'php': 'PHP',
             'colossians': 'COL', 'col': 'COL',
             '1 thessalonians': '1TH', '1thessalonians': '1TH', '1 thess': '1TH', '1thess': '1TH',
             '2 thessalonians': '2TH', '2thessalonians': '2TH', '2 thess': '2TH', '2thess': '2TH',
             '1 timothy': '1TI', '1timothy': '1TI', '1 tim': '1TI', '1tim': '1TI',
             '2 timothy': '2TI', '2timothy': '2TI', '2 tim': '2TI', '2tim': '2TI',
-            'titus': 'TIT', 'tit': 'TIT',
-            'philemon': 'PHM', 'philem': 'PHM', 'phm': 'PHM',
             'hebrews': 'HEB', 'heb': 'HEB',
             'james': 'JAS', 'jas': 'JAS',
             '1 peter': '1PE', '1peter': '1PE', '1 pet': '1PE', '1pet': '1PE',
@@ -805,27 +699,10 @@
             '1 john': '1JN', '1john': '1JN',
             '2 john': '2JN', '2john': '2JN',
             '3 john': '3JN', '3john': '3JN',
-            'jude': 'JUD', 'jud': 'JUD',
             'revelation': 'REV', 'rev': 'REV'
         };
 
-        // Autocomplete variables
-        let selectedBookIndex = -1;
-        let filteredBooks = [];
-
         // Initialize event listeners
-        const bookInput = document.getElementById('bookInput');
-        const bookDropdown = document.getElementById('bookDropdown');
-
-        bookInput.addEventListener('input', handleBookInput);
-        bookInput.addEventListener('keydown', handleBookKeydown);
-        bookInput.addEventListener('blur', () => {
-            // Delay hiding to allow click on dropdown
-            setTimeout(() => {
-                bookDropdown.classList.remove('show');
-            }, 200);
-        });
-
         document.getElementById('loadVerseBtn').addEventListener('click', loadCustomVerse);
         document.querySelectorAll('.verse-option').forEach(btn => {
             btn.addEventListener('click', (e) => loadVerseByRef(e.target.dataset.ref));
@@ -835,92 +712,6 @@
         document.getElementById('changeVerse').addEventListener('click', changeVerse);
         document.getElementById('continueBtn').addEventListener('click', continueToNextLevel);
         document.getElementById('closeRickroll').addEventListener('click', closeRickroll);
-
-        // Autocomplete functions
-        function handleBookInput(e) {
-            const searchTerm = e.target.value.toLowerCase().trim();
-            
-            if (searchTerm === '') {
-                bookDropdown.classList.remove('show');
-                return;
-            }
-
-            // Filter books that start with or contain the search term
-            filteredBooks = bibleBooks.filter(book => 
-                book.toLowerCase().includes(searchTerm)
-            );
-
-            if (filteredBooks.length > 0) {
-                displayBookDropdown(filteredBooks);
-                selectedBookIndex = -1;
-            } else {
-                bookDropdown.classList.remove('show');
-            }
-        }
-
-        function displayBookDropdown(books) {
-            bookDropdown.innerHTML = '';
-            
-            books.forEach((book, index) => {
-                const option = document.createElement('div');
-                option.className = 'book-option';
-                option.textContent = book;
-                option.addEventListener('click', () => selectBook(book));
-                bookDropdown.appendChild(option);
-            });
-
-            bookDropdown.classList.add('show');
-        }
-
-        function handleBookKeydown(e) {
-            const options = bookDropdown.querySelectorAll('.book-option');
-            
-            if (!bookDropdown.classList.contains('show') || options.length === 0) {
-                return;
-            }
-
-            switch(e.key) {
-                case 'ArrowDown':
-                    e.preventDefault();
-                    selectedBookIndex = Math.min(selectedBookIndex + 1, options.length - 1);
-                    updateSelectedOption(options);
-                    break;
-                
-                case 'ArrowUp':
-                    e.preventDefault();
-                    selectedBookIndex = Math.max(selectedBookIndex - 1, 0);
-                    updateSelectedOption(options);
-                    break;
-                
-                case 'Enter':
-                    e.preventDefault();
-                    if (selectedBookIndex >= 0 && selectedBookIndex < filteredBooks.length) {
-                        selectBook(filteredBooks[selectedBookIndex]);
-                    }
-                    break;
-                
-                case 'Escape':
-                    bookDropdown.classList.remove('show');
-                    break;
-            }
-        }
-
-        function updateSelectedOption(options) {
-            options.forEach((option, index) => {
-                if (index === selectedBookIndex) {
-                    option.classList.add('selected');
-                    option.scrollIntoView({ block: 'nearest' });
-                } else {
-                    option.classList.remove('selected');
-                }
-            });
-        }
-
-        function selectBook(bookName) {
-            bookInput.value = bookName;
-            bookDropdown.classList.remove('show');
-            document.getElementById('chapterInput').focus();
-        }
 
         // API Functions
         async function fetchVerse(verseId) {
@@ -933,7 +724,7 @@
 
             try {
                 const response = await fetch(
-                    `https://rest.api.bible/v1/bibles/${DEFAULT_BIBLE_ID}/verses/${verseId}?content-type=html&include-notes=false&include-titles=false&include-chapter-numbers=false&include-verse-numbers=false&include-verse-spans=false&use-org-id=false`,
+                    `https://rest.api.bible/v1/bibles/${DEFAULT_BIBLE_ID}/verses/${verseId}?content-type=html&include-notes=false&include-titles=true&include-chapter-numbers=false&include-verse-numbers=false&include-verse-spans=false&use-org-id=false`,
                     {
                         headers: {
                             'api-key': API_KEY
@@ -1066,15 +857,6 @@
             });
             
             updateWordsLeft();
-
-// Update button text based on level
-const nextLevelBtn = document.getElementById('nextLevel');
-if (currentLevel >= levelConfigs.length) {
-    nextLevelBtn.textContent = 'Verse Memorized Correctly! 🎉';
-} else {
-    nextLevelBtn.textContent = 'Next Level ➡️';
-}
-
         }
 
         function revealWord(wordSpan, index) {
@@ -1084,13 +866,13 @@ if (currentLevel >= levelConfigs.length) {
             wordSpan.classList.add('revealed');
             revealedWords.add(index);
             
-            currentScore = Math.max(0, currentScore - 10);
-
-           // Check if score hit 0 and trigger rickroll
+            currentScore = Math.max(0, currentScore - 5);
+            
+            // Check if score hit 0 and trigger rickroll
             if (currentScore === 0) {
                 showRickroll();
             }
-
+            
             updateStats();
             
             wordSpan.style.animation = 'none';
@@ -1122,14 +904,13 @@ if (currentLevel >= levelConfigs.length) {
             document.getElementById('levelComplete').classList.remove('show');
         }
 
-function handleNextLevel() {
-    if (currentLevel < levelConfigs.length) {
-        showLevelComplete();
-    } else {
-        // Last level completed!
-        showFinalCelebration();
-    }
-}
+        function handleNextLevel() {
+            if (currentLevel < levelConfigs.length) {
+                showLevelComplete();
+            } else {
+                alert('🎉 Congratulations! You completed all levels! 🎉');
+            }
+        }
 
         function continueToNextLevel() {
             hideLevelComplete();
@@ -1154,7 +935,6 @@ function handleNextLevel() {
             updateStats();
         }
 
-
         // Rickroll functions
         function showRickroll() {
             const iframe = document.getElementById('rickrollVideo');
@@ -1170,84 +950,6 @@ function handleNextLevel() {
             document.getElementById('rickrollModal').classList.remove('show');
             tryAgain(); // Reset the game
         }
-
-        function showFinalCelebration() {
-    // Show the level complete modal first
-    showLevelComplete();
-    
-    // Trigger fireworks
-    setTimeout(() => {
-        launchFireworks();
-    }, 500);
-    
-    // Show walking animal
-    setTimeout(() => {
-        showWalkingAnimal();
-    }, 1000);
-}
-
-function launchFireworks() {
-    const container = document.getElementById('fireworksContainer');
-    const colors = ['#2ec4b6', '#ff9f1c', '#e71d36', '#fdfffc'];
-    
-    // Launch 15 fireworks
-    for (let i = 0; i < 15; i++) {
-        setTimeout(() => {
-            createFirework(container, colors);
-        }, i * 300);
-    }
-}
-
-function createFirework(container, colors) {
-    const x = Math.random() * window.innerWidth;
-    const y = Math.random() * (window.innerHeight * 0.5);
-    
-    // Create 20 particles per firework
-    for (let i = 0; i < 20; i++) {
-        const particle = document.createElement('div');
-        particle.className = 'firework';
-        particle.style.left = x + 'px';
-        particle.style.top = y + 'px';
-        particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-        
-        const angle = (Math.PI * 2 * i) / 20;
-        const velocity = 50 + Math.random() * 100;
-        const tx = Math.cos(angle) * velocity;
-        const ty = Math.sin(angle) * velocity;
-        
-        particle.style.setProperty('--tx', tx + 'px');
-        particle.style.setProperty('--ty', ty + 'px');
-        
-        container.appendChild(particle);
-        
-        // Remove particle after animation
-        setTimeout(() => {
-            particle.remove();
-        }, 1000);
-    }
-}
-
-function showWalkingAnimal() {
-    const animalGifs = [
-        'https://media.giphy.com/media/RLOTE6CLOcCWBv5POp/giphy.gif',
-        'https://media.giphy.com/media/sandiegozoo-nk2C49mUNljb1scZgY/giphy.gif',
-        'https://media.giphy.com/media/fancy-cat-funny-VlchmIoZPjjYQ/giphy.gif',
-        'https://media.giphy.com/media/dog-walk-nBgH1BhsX0qje/giphy.gif',
-                'https://media.giphy.com/media/animated-bird-TBmdZGucMuy5O/giphy.gif',
-        'https://media.giphy.com/media/dog-pomeranian-pom-bREiLZWGym93rCHjjj/giphy.gif',
-    ];
-    
-    const animal = document.getElementById('walkingAnimal');
-    const randomGif = animalGifs[Math.floor(Math.random() * animalGifs.length)];
-    
-    // Change to use an img tag instead of text
-    animal.innerHTML = `<img src="${randomGif}" style="width: 150px; height: 150px; object-fit: contain;">`;
-    animal.style.display = 'block';
-    
-    setTimeout(() => {
-        animal.style.display = 'none';
-    }, 8000);
-}
     </script>
 </body>
 </html>

@@ -517,59 +517,6 @@
                 height: 200px;
             }
         }
-
-/* Fireworks Animation */
-.fireworks {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    z-index: 9999;
-}
-
-.firework {
-    position: absolute;
-    width: 5px;
-    height: 5px;
-    border-radius: 50%;
-    animation: explode 1s ease-out forwards;
-}
-
-@keyframes explode {
-    0% {
-        transform: translate(0, 0) scale(1);
-        opacity: 1;
-    }
-    100% {
-        transform: translate(var(--tx), var(--ty)) scale(0);
-        opacity: 0;
-    }
-}
-
-/* Walking Animal */
-.walking-animal {
-    position: fixed;
-    bottom: 0;
-    left: -150px;
-    width: 100px;
-    height: 100px;
-    font-size: 80px;
-    animation: walkAcross 8s linear forwards;
-    z-index: 9998;
-}
-
-@keyframes walkAcross {
-    0% {
-        left: -150px;
-        transform: scaleX(1);
-    }
-    100% {
-        left: calc(100% + 150px);
-        transform: scaleX(1);
-    }
-}
     </style>
 </head>
 <body>
@@ -690,12 +637,6 @@
             I've Learned My Lesson 😅
         </button>
     </div>
-
-    <!-- Fireworks Container -->
-<div id="fireworksContainer" class="fireworks"></div>
-
-<!-- Walking Animal -->
-<div id="walkingAnimal" class="walking-animal" style="display: none;"></div>
 
     <script>
         // Replace with your actual API.Bible key
@@ -1066,15 +1007,6 @@
             });
             
             updateWordsLeft();
-
-// Update button text based on level
-const nextLevelBtn = document.getElementById('nextLevel');
-if (currentLevel >= levelConfigs.length) {
-    nextLevelBtn.textContent = 'Verse Memorized Correctly! 🎉';
-} else {
-    nextLevelBtn.textContent = 'Next Level ➡️';
-}
-
         }
 
         function revealWord(wordSpan, index) {
@@ -1122,14 +1054,13 @@ if (currentLevel >= levelConfigs.length) {
             document.getElementById('levelComplete').classList.remove('show');
         }
 
-function handleNextLevel() {
-    if (currentLevel < levelConfigs.length) {
-        showLevelComplete();
-    } else {
-        // Last level completed!
-        showFinalCelebration();
-    }
-}
+        function handleNextLevel() {
+            if (currentLevel < levelConfigs.length) {
+                showLevelComplete();
+            } else {
+                alert('🎉 Congratulations! You completed all levels! 🎉');
+            }
+        }
 
         function continueToNextLevel() {
             hideLevelComplete();
@@ -1170,84 +1101,6 @@ function handleNextLevel() {
             document.getElementById('rickrollModal').classList.remove('show');
             tryAgain(); // Reset the game
         }
-
-        function showFinalCelebration() {
-    // Show the level complete modal first
-    showLevelComplete();
-    
-    // Trigger fireworks
-    setTimeout(() => {
-        launchFireworks();
-    }, 500);
-    
-    // Show walking animal
-    setTimeout(() => {
-        showWalkingAnimal();
-    }, 1000);
-}
-
-function launchFireworks() {
-    const container = document.getElementById('fireworksContainer');
-    const colors = ['#2ec4b6', '#ff9f1c', '#e71d36', '#fdfffc'];
-    
-    // Launch 15 fireworks
-    for (let i = 0; i < 15; i++) {
-        setTimeout(() => {
-            createFirework(container, colors);
-        }, i * 300);
-    }
-}
-
-function createFirework(container, colors) {
-    const x = Math.random() * window.innerWidth;
-    const y = Math.random() * (window.innerHeight * 0.5);
-    
-    // Create 20 particles per firework
-    for (let i = 0; i < 20; i++) {
-        const particle = document.createElement('div');
-        particle.className = 'firework';
-        particle.style.left = x + 'px';
-        particle.style.top = y + 'px';
-        particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-        
-        const angle = (Math.PI * 2 * i) / 20;
-        const velocity = 50 + Math.random() * 100;
-        const tx = Math.cos(angle) * velocity;
-        const ty = Math.sin(angle) * velocity;
-        
-        particle.style.setProperty('--tx', tx + 'px');
-        particle.style.setProperty('--ty', ty + 'px');
-        
-        container.appendChild(particle);
-        
-        // Remove particle after animation
-        setTimeout(() => {
-            particle.remove();
-        }, 1000);
-    }
-}
-
-function showWalkingAnimal() {
-    const animalGifs = [
-        'https://media.giphy.com/media/RLOTE6CLOcCWBv5POp/giphy.gif',
-        'https://media.giphy.com/media/sandiegozoo-nk2C49mUNljb1scZgY/giphy.gif',
-        'https://media.giphy.com/media/fancy-cat-funny-VlchmIoZPjjYQ/giphy.gif',
-        'https://media.giphy.com/media/dog-walk-nBgH1BhsX0qje/giphy.gif',
-                'https://media.giphy.com/media/animated-bird-TBmdZGucMuy5O/giphy.gif',
-        'https://media.giphy.com/media/dog-pomeranian-pom-bREiLZWGym93rCHjjj/giphy.gif',
-    ];
-    
-    const animal = document.getElementById('walkingAnimal');
-    const randomGif = animalGifs[Math.floor(Math.random() * animalGifs.length)];
-    
-    // Change to use an img tag instead of text
-    animal.innerHTML = `<img src="${randomGif}" style="width: 150px; height: 150px; object-fit: contain;">`;
-    animal.style.display = 'block';
-    
-    setTimeout(() => {
-        animal.style.display = 'none';
-    }, 8000);
-}
     </script>
 </body>
 </html>
