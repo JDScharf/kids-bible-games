@@ -551,11 +551,10 @@
 /* Walking Animal */
 .walking-animal {
     position: fixed;
-    bottom: 0;
+    bottom: 15px;
     left: -150px;
-    width: 100px;
-    height: 100px;
-    font-size: 80px;
+    width: 300px;
+    height: 300px;
     animation: walkAcross 8s linear forwards;
     z-index: 9998;
 }
@@ -1229,18 +1228,19 @@ function createFirework(container, colors) {
 
 function showWalkingAnimal() {
     const animalGifs = [
-        'https://media.giphy.com/media/RLOTE6CLOcCWBv5POp/giphy.gif',
-        'https://media.giphy.com/media/sandiegozoo-nk2C49mUNljb1scZgY/giphy.gif',
-        'https://media.giphy.com/media/fancy-cat-funny-VlchmIoZPjjYQ/giphy.gif',
-        'https://media.giphy.com/media/dog-walk-nBgH1BhsX0qje/giphy.gif',
-                'https://media.giphy.com/media/animated-bird-TBmdZGucMuy5O/giphy.gif',
-        'https://media.giphy.com/media/dog-pomeranian-pom-bREiLZWGym93rCHjjj/giphy.gif',
+        'gifs/bird.gif',
+        'gifs/capybara.gif',
+                'gifs/dog-summer.gif',
+        'gifs/dog-walk.gif',
+                'gifs/fancy-cat.gif',
+        'gifs/groundhog.gif',
+                'gifs/video-dog.gif'
+        // etc.
     ];
     
     const animal = document.getElementById('walkingAnimal');
     const randomGif = animalGifs[Math.floor(Math.random() * animalGifs.length)];
     
-    // Change to use an img tag instead of text
     animal.innerHTML = `<img src="${randomGif}" style="width: 150px; height: 150px; object-fit: contain;">`;
     animal.style.display = 'block';
     
