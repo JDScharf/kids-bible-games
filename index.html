@@ -1,349 +1,381 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Kid Life Bible Games</title>
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Bubblegum+Sans&display=swap" rel="stylesheet">
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Bubblegum+Sans&display=swap"
+      rel="stylesheet"
+    />
     <style>
-        :root {
-            --midnight: #011627;
-            --white: #fdfffc;
-            --teal: #2ec4b6;
-            --red: #e71d36;
-            --orange: #ff9f1c;
-        }
+      :root {
+        --midnight: #011627;
+        --white: #fdfffc;
+        --teal: #2ec4b6;
+        --red: #e71d36;
+        --orange: #ff9f1c;
+      }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        -webkit-tap-highlight-color: transparent;
+      }
 
-        body {
-            font-family: 'Fredoka', sans-serif;
-            background: var(--midnight);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            overflow-x: hidden;
-            position: relative;
-        }
+      body {
+        font-family: "Fredoka", sans-serif;
+        background: var(--midnight);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        overflow-x: hidden;
+        position: relative;
+      }
 
-        /* Animated background pattern */
-        body::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-image: 
-                radial-gradient(circle at 20% 30%, rgba(46, 196, 182, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 80% 70%, rgba(255, 159, 28, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 50% 50%, rgba(231, 29, 54, 0.05) 0%, transparent 50%);
-            animation: bgMove 20s ease-in-out infinite;
-        }
+      /* Animated background pattern */
+      body::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-image: radial-gradient(
+            circle at 20% 30%,
+            rgba(46, 196, 182, 0.1) 0%,
+            transparent 50%
+          ),
+          radial-gradient(
+            circle at 80% 70%,
+            rgba(255, 159, 28, 0.1) 0%,
+            transparent 50%
+          ),
+          radial-gradient(
+            circle at 50% 50%,
+            rgba(231, 29, 54, 0.05) 0%,
+            transparent 50%
+          );
+        animation: bgMove 20s ease-in-out infinite;
+      }
 
-        @keyframes bgMove {
-            0%, 100% { transform: scale(1) rotate(0deg); }
-            50% { transform: scale(1.1) rotate(5deg); }
+      @keyframes bgMove {
+        0%,
+        100% {
+          transform: scale(1) rotate(0deg);
         }
+        50% {
+          transform: scale(1.1) rotate(5deg);
+        }
+      }
 
+      .container {
+        background: var(--white);
+        border-radius: 40px;
+        padding: 50px;
+        max-width: 1400px;
+        width: 100%;
+        box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
+        position: relative;
+        z-index: 1;
+      }
+
+      /* Header */
+      .header {
+        text-align: center;
+        margin-bottom: 40px;
+      }
+
+      .title {
+        font-family: "Bubblegum Sans", cursive;
+        font-size: 4em;
+        color: var(--teal);
+        margin-bottom: 10px;
+      }
+
+      .subtitle {
+        font-size: 2em;
+        color: var(--midnight);
+        font-weight: 600;
+        margin-bottom: 10px;
+      }
+
+      .description {
+        font-size: 1.4em;
+        color: var(--midnight);
+        font-weight: 500;
+        opacity: 0.8;
+      }
+
+      /* Game Cards Grid */
+      .games-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        gap: 30px;
+        margin-top: 50px;
+      }
+
+      /* Game Card */
+      .game-card {
+        background: linear-gradient(135deg, var(--teal), var(--orange));
+        border-radius: 30px;
+        padding: 40px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.4s ease;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        text-decoration: none;
+        display: block;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .game-card::before {
+        content: "";
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(
+          circle,
+          rgba(253, 255, 252, 0.2) 0%,
+          transparent 70%
+        );
+        opacity: 0;
+        transition: opacity 0.4s;
+      }
+
+      .game-card:hover::before {
+        opacity: 1;
+      }
+
+      .game-card:hover {
+        transform: translateY(-10px) scale(1.02);
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+      }
+
+      .game-card:active {
+        transform: translateY(-5px) scale(1);
+      }
+
+      /* Game Card Variations */
+      .game-card.card-1 {
+        background: linear-gradient(135deg, var(--teal), #1a9d91);
+      }
+
+      .game-card.card-2 {
+        background: linear-gradient(135deg, var(--orange), var(--red));
+      }
+
+      .game-card.card-3 {
+        background: linear-gradient(135deg, #8b5cf6, #ec4899);
+      }
+
+      /* Icon */
+      .game-icon {
+        font-size: 5em;
+        margin-bottom: 20px;
+        display: block;
+        animation: iconBounce 2s ease-in-out infinite;
+      }
+
+      @keyframes iconBounce {
+        0%,
+        100% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.1);
+        }
+      }
+
+      .game-card:hover .game-icon {
+        animation: iconSpin 0.6s ease-in-out;
+      }
+
+      @keyframes iconSpin {
+        0% {
+          transform: rotate(0deg) scale(1);
+        }
+        50% {
+          transform: rotate(180deg) scale(1.2);
+        }
+        100% {
+          transform: rotate(360deg) scale(1);
+        }
+      }
+
+      /* Game Title */
+      .game-title {
+        font-family: "Bubblegum Sans", cursive;
+        font-size: 2.5em;
+        color: var(--white);
+        margin-bottom: 15px;
+        position: relative;
+        z-index: 1;
+      }
+
+      /* Game Description */
+      .game-description {
+        font-size: 1.3em;
+        color: var(--white);
+        font-weight: 600;
+        line-height: 1.6;
+        opacity: 0.95;
+        position: relative;
+        z-index: 1;
+      }
+
+      /* Play Button */
+      .play-button {
+        display: inline-block;
+        margin-top: 25px;
+        padding: 15px 40px;
+        background: var(--white);
+        color: var(--midnight);
+        border-radius: 50px;
+        font-size: 1.4em;
+        font-weight: 700;
+        transition: all 0.3s;
+        position: relative;
+        z-index: 1;
+      }
+
+      .game-card:hover .play-button {
+        transform: scale(1.1);
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+      }
+
+      /* Footer */
+      .footer {
+        text-align: center;
+        margin-top: 50px;
+        padding-top: 30px;
+        border-top: 3px solid var(--teal);
+      }
+
+      .footer-text {
+        font-size: 1.2em;
+        color: var(--midnight);
+        font-weight: 600;
+        opacity: 0.7;
+      }
+
+      /* Responsive Design */
+      @media (max-width: 768px) {
         .container {
-            background: var(--white);
-            border-radius: 40px;
-            padding: 50px;
-            max-width: 1400px;
-            width: 100%;
-            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
-            position: relative;
-            z-index: 1;
-        }
-
-        /* Header */
-        .header {
-            text-align: center;
-            margin-bottom: 40px;
+          padding: 30px 20px;
         }
 
         .title {
-            font-family: 'Bubblegum Sans', cursive;
-            font-size: 4em;
-            color: var(--teal);
-            margin-bottom: 10px;
+          font-size: 2.8em;
         }
 
         .subtitle {
-            font-size: 2em;
-            color: var(--midnight);
-            font-weight: 600;
-            margin-bottom: 10px;
+          font-size: 1.5em;
         }
 
         .description {
-            font-size: 1.4em;
-            color: var(--midnight);
-            font-weight: 500;
-            opacity: 0.8;
+          font-size: 1.1em;
         }
 
-        /* Game Cards Grid */
         .games-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 30px;
-            margin-top: 50px;
+          grid-template-columns: 1fr;
+          gap: 20px;
         }
 
-        /* Game Card */
         .game-card {
-            background: linear-gradient(135deg, var(--teal), var(--orange));
-            border-radius: 30px;
-            padding: 40px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.4s ease;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            text-decoration: none;
-            display: block;
-            position: relative;
-            overflow: hidden;
+          padding: 30px;
         }
 
-        .game-card::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(253, 255, 252, 0.2) 0%, transparent 70%);
-            opacity: 0;
-            transition: opacity 0.4s;
-        }
-
-        .game-card:hover::before {
-            opacity: 1;
-        }
-
-        .game-card:hover {
-            transform: translateY(-10px) scale(1.02);
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
-        }
-
-        .game-card:active {
-            transform: translateY(-5px) scale(1);
-        }
-
-        /* Game Card Variations */
-        .game-card.card-1 {
-            background: linear-gradient(135deg, var(--teal), #1a9d91);
-        }
-
-        .game-card.card-2 {
-            background: linear-gradient(135deg, var(--orange), var(--red));
-        }
-
-        .game-card.card-3 {
-            background: linear-gradient(135deg, #8b5cf6, #ec4899);
-        }
-
-        /* Icon */
         .game-icon {
-            font-size: 5em;
-            margin-bottom: 20px;
-            display: block;
-            animation: iconBounce 2s ease-in-out infinite;
+          font-size: 4em;
         }
 
-        @keyframes iconBounce {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-        }
-
-        .game-card:hover .game-icon {
-            animation: iconSpin 0.6s ease-in-out;
-        }
-
-        @keyframes iconSpin {
-            0% { transform: rotate(0deg) scale(1); }
-            50% { transform: rotate(180deg) scale(1.2); }
-            100% { transform: rotate(360deg) scale(1); }
-        }
-
-        /* Game Title */
         .game-title {
-            font-family: 'Bubblegum Sans', cursive;
-            font-size: 2.5em;
-            color: var(--white);
-            margin-bottom: 15px;
-            position: relative;
-            z-index: 1;
+          font-size: 2em;
         }
 
-        /* Game Description */
         .game-description {
-            font-size: 1.3em;
-            color: var(--white);
-            font-weight: 600;
-            line-height: 1.6;
-            opacity: 0.95;
-            position: relative;
-            z-index: 1;
+          font-size: 1.1em;
         }
-
-        /* Play Button */
-        .play-button {
-            display: inline-block;
-            margin-top: 25px;
-            padding: 15px 40px;
-            background: var(--white);
-            color: var(--midnight);
-            border-radius: 50px;
-            font-size: 1.4em;
-            font-weight: 700;
-            transition: all 0.3s;
-            position: relative;
-            z-index: 1;
-        }
-
-        .game-card:hover .play-button {
-            transform: scale(1.1);
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
-        }
-
-        /* Footer */
-        .footer {
-            text-align: center;
-            margin-top: 50px;
-            padding-top: 30px;
-            border-top: 3px solid var(--teal);
-        }
-
-        .footer-text {
-            font-size: 1.2em;
-            color: var(--midnight);
-            font-weight: 600;
-            opacity: 0.7;
-        }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .container {
-                padding: 30px 20px;
-            }
-
-            .title {
-                font-size: 2.8em;
-            }
-
-            .subtitle {
-                font-size: 1.5em;
-            }
-
-            .description {
-                font-size: 1.1em;
-            }
-
-            .games-grid {
-                grid-template-columns: 1fr;
-                gap: 20px;
-            }
-
-            .game-card {
-                padding: 30px;
-            }
-
-            .game-icon {
-                font-size: 4em;
-            }
-
-            .game-title {
-                font-size: 2em;
-            }
-
-            .game-description {
-                font-size: 1.1em;
-            }
-        }
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <div class="container">
+      <!-- Header -->
+      <div class="header">
+        <h1 class="title">📖 Kid Life Bible Games</h1>
+        <p class="subtitle">Learn God's Word Through Fun Games!</p>
+        <p class="description">Choose a game below to start playing</p>
+      </div>
 
-        <!-- Header -->
-        <div class="header">
-            <h1 class="title">📖 Kid Life Bible Games</h1>
-            <p class="subtitle">Learn God's Word Through Fun Games!</p>
-            <p class="description">Choose a game below to start playing</p>
-        </div>
+      <!-- Game Cards -->
+      <div class="games-grid">
+        <!-- Memory Game Card -->
+        <a href="memory-game.html" class="game-card card-1">
+          <span class="game-icon">&#129504;</span>
+          <h2 class="game-title">Memory Game</h2>
+          <p class="game-description">
+            Match pairs of Bible characters and scenes! Work with your team to
+            find all the matches.
+          </p>
+          <div class="play-button">Play Now ▶️</div>
+        </a>
 
-        <!-- Game Cards -->
-        <div class="games-grid">
-            <!-- Memory Game Card -->
-            <a href="bible-matching-game.html" class="game-card card-1">
-                <span class="game-icon">🧩</span>
-                <h2 class="game-title">Memory Game</h2>
-                <p class="game-description">
-                    Match pairs of Bible characters and scenes! 
-                    Work with your team to find all the matches.
-                </p>
-                <div class="play-button">Play Now ▶️</div>
-            </a>
+        <!-- Verse Game Card -->
+        <a href="memory-verse-game.html" class="game-card card-2">
+          <span class="game-icon">📝</span>
+          <h2 class="game-title">Verse Game</h2>
+          <p class="game-description">
+            Memorize your favorite Bible verses! Hide the words and test your
+            memory.
+          </p>
+          <div class="play-button">Play Now ▶️</div>
+        </a>
 
-            <!-- Verse Game Card -->
-            <a href="memory-verse-game.html" class="game-card card-2">
-                <span class="game-icon">📝</span>
-                <h2 class="game-title">Verse Game</h2>
-                <p class="game-description">
-                    Memorize your favorite Bible verses! 
-                    Hide the words and test your memory.
-                </p>
-                <div class="play-button">Play Now ▶️</div>
-            </a>
+        <!-- Quiz Game Card -->
+        <a href="story-order.html" class="game-card card-3">
+          <span class="game-icon">&#128256;</span>
+          <h2 class="game-title">Story Order Game</h2>
+          <p class="game-description">
+            Learn Bible stories by placing the events in the right order!
+          </p>
+          <div class="play-button">Play Now ▶️</div>
+        </a>
+      </div>
 
-            <!-- Quiz Game Card -->
-            <a href="game3.html" class="game-card card-3">
-                <span class="game-icon">❓</span>
-                <h2 class="game-title">Quiz Game</h2>
-                <p class="game-description">
-                    Answer questions about Bible stories! 
-                    Challenge yourself and learn more.
-                </p>
-                <div class="play-button">Play Now ▶️</div>
-            </a>
-        </div>
-
-        <!-- Footer -->
-        <div class="footer">
-            <p class="footer-text">
-                "Train up a child in the way he should go" - Proverbs 22:6
-            </p>
-        </div>
+      <!-- Footer -->
+      <div class="footer">
+        <p class="footer-text">
+          "Train up a child in the way he should go" - Proverbs 22:6
+        </p>
+      </div>
     </div>
 
     <script>
-        // Add click sound effect or animation if desired
-        document.querySelectorAll('.game-card').forEach(card => {
-            card.addEventListener('click', function(e) {
-                // You can add additional click effects here
-                this.style.transform = 'scale(0.95)';
-                setTimeout(() => {
-                    this.style.transform = '';
-                }, 100);
-            });
+      // Add click sound effect or animation if desired
+      document.querySelectorAll(".game-card").forEach((card) => {
+        card.addEventListener("click", function (e) {
+          // You can add additional click effects here
+          this.style.transform = "scale(0.95)";
+          setTimeout(() => {
+            this.style.transform = "";
+          }, 100);
         });
+      });
 
-        // Add hover sound or additional effects
-        document.querySelectorAll('.game-card').forEach(card => {
-            card.addEventListener('mouseenter', function() {
-                // Optional: Add sound effects here
-            });
+      // Add hover sound or additional effects
+      document.querySelectorAll(".game-card").forEach((card) => {
+        card.addEventListener("mouseenter", function () {
+          // Optional: Add sound effects here
         });
+      });
     </script>
-</body>
+  </body>
 </html>

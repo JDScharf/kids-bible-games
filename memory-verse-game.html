@@ -478,6 +478,41 @@
             font-weight: 600;
         }
 
+        /* Home Button */
+.home-button {
+    position: absolute;
+    top: 30px;
+    right: 30px;
+    background: var(--orange);
+    color: var(--white);
+    padding: 15px 30px;
+    border: none;
+    border-radius: 15px;
+    font-size: 1.3em;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: 'Fredoka', sans-serif;
+    transition: all 0.3s;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    text-decoration: none;
+    display: inline-block;
+}
+
+.home-button:hover {
+    background: var(--teal);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+}
+
+@media (max-width: 768px) {
+    .home-button {
+        top: 15px;
+        right: 15px;
+        padding: 10px 20px;
+        font-size: 1.1em;
+    }
+}
+
         @media (max-width: 768px) {
             .container {
                 padding: 30px;
@@ -573,6 +608,7 @@
 </head>
 <body>
     <div class="container">
+                <a href="index.html" class="home-button">🏠 Home</a>
         <!-- Selection Screen -->
         <div id="selectionScreen" class="selection-screen">
             <div class="header">

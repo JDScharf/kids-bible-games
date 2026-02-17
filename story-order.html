@@ -107,7 +107,7 @@
         /* Card Styles */
         .card {
             width: 200px;
-            height: 300px;
+            height: 50%;
             background: var(--white);
             border-radius: 20px;
             cursor: grab;
@@ -117,6 +117,7 @@
             flex-direction: column;
             overflow: hidden;
             position: relative;
+            /* padding-bottom: 10px; */
         }
 
         .card:active {
@@ -154,11 +155,12 @@
             justify-content: center;
             padding: 10px;
             background: var(--white);
+            /* padding-bottom: 20px; */
         }
 
         .card-image img {
             max-width: 100%;
-            max-height: 100%;
+            /* max-height: 100%; */
             object-fit: contain;
             border-radius: 10px;
         }
@@ -327,6 +329,41 @@
             }
         }
 
+        /* Home Button */
+.home-button {
+    position: absolute;
+    top: 30px;
+    right: 30px;
+    background: var(--orange);
+    color: var(--white);
+    padding: 15px 30px;
+    border: none;
+    border-radius: 15px;
+    font-size: 1.3em;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: 'Fredoka', sans-serif;
+    transition: all 0.3s;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    text-decoration: none;
+    display: inline-block;
+}
+
+.home-button:hover {
+    background: var(--teal);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+}
+
+@media (max-width: 768px) {
+    .home-button {
+        top: 15px;
+        right: 15px;
+        padding: 10px 20px;
+        font-size: 1.1em;
+    }
+}
+
         /* Responsive Design */
         @media (max-width: 1400px) {
             .game-board {
@@ -378,7 +415,7 @@
 
             .card {
                 width: 200px;
-                height: 300px;
+                height: 400px;
             }
 
             .card.shift-right {
@@ -393,6 +430,7 @@
 </head>
 <body>
     <div class="container">
+        <a href="index.html" class="home-button">🏠 Home</a>
         <div class="header">
             <h1 class="title">📖 Kid Life - Bible Story Game</h1>
             <p class="subtitle">Saul's Conversion</p>
@@ -557,9 +595,12 @@
             if (draggedElement !== this) {
                 const dropIndex = parseInt(this.dataset.position);
                 
-                // Swap the cards in the currentOrder array
-                [currentOrder[draggedIndex], currentOrder[dropIndex]] = 
-                [currentOrder[dropIndex], currentOrder[draggedIndex]];
+                // Remove the dragged card from its current position
+                const draggedCard = currentOrder[draggedIndex];
+                currentOrder.splice(draggedIndex, 1);
+                
+                // Insert it at the drop position
+                currentOrder.splice(dropIndex, 0, draggedCard);
 
                 renderCards();
             }
