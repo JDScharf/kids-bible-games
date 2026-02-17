@@ -100,18 +100,18 @@
             padding: 30px;
             background: rgba(46, 196, 182, 0.05);
             border-radius: 30px;
-            min-height: 280px;
+            min-height: 380px;
             flex-wrap: wrap;
         }
 
         /* Card Styles */
         .card {
             width: 200px;
-            height: 220px;
+            height: 300px;
             background: var(--white);
             border-radius: 20px;
             cursor: grab;
-            transition: all 0.3s;
+            transition: transform 0.3s, box-shadow 0.3s;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
             display: flex;
             flex-direction: column;
@@ -129,8 +129,12 @@
         }
 
         .card.drag-over {
-            transform: scale(1.05);
+            transform: translateX(20px);
             box-shadow: 0 10px 25px rgba(46, 196, 182, 0.4);
+        }
+
+        .card.shift-right {
+            transform: translateX(220px);
         }
 
         .card-number {
@@ -331,7 +335,11 @@
 
             .card {
                 width: 180px;
-                height: 200px;
+                height: 280px;
+            }
+
+            .card.shift-right {
+                transform: translateX(200px);
             }
         }
 
@@ -354,7 +362,11 @@
 
             .card {
                 width: 160px;
-                height: 180px;
+                height: 260px;
+            }
+
+            .card.shift-right {
+                transform: translateX(180px);
             }
         }
 
@@ -366,7 +378,11 @@
 
             .card {
                 width: 200px;
-                height: 220px;
+                height: 300px;
+            }
+
+            .card.shift-right {
+                transform: translateY(320px);
             }
 
             .game-controls {
@@ -484,9 +500,10 @@
         function handleDragEnd(e) {
             this.classList.remove('dragging');
             
-            // Remove drag-over class from all cards
+            // Remove drag-over and shift-right class from all cards
             document.querySelectorAll('.card').forEach(card => {
                 card.classList.remove('drag-over');
+                card.classList.remove('shift-right');
             });
         }
 
@@ -501,11 +518,35 @@
         function handleDragEnter(e) {
             if (this !== draggedElement) {
                 this.classList.add('drag-over');
+                
+                // Shift all cards to the right of the drop target
+                const dropIndex = parseInt(this.dataset.position);
+                const cards = document.querySelectorAll('.card');
+                
+                cards.forEach((card) => {
+                    const cardIndex = parseInt(card.dataset.position);
+                    if (draggedIndex < dropIndex) {
+                        // Dragging forward: shift cards between dragged and drop target left
+                        if (cardIndex > draggedIndex && cardIndex <= dropIndex) {
+                            card.classList.add('shift-right');
+                        }
+                    } else {
+                        // Dragging backward: shift cards between drop target and dragged right
+                        if (cardIndex >= dropIndex && cardIndex < draggedIndex) {
+                            card.classList.add('shift-right');
+                        }
+                    }
+                });
             }
         }
 
         function handleDragLeave(e) {
             this.classList.remove('drag-over');
+            
+            // Remove shift from all cards when leaving
+            document.querySelectorAll('.card').forEach(card => {
+                card.classList.remove('shift-right');
+            });
         }
 
         function handleDrop(e) {
