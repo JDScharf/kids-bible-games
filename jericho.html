@@ -1,0 +1,1339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jericho Wall Game</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Bubblegum+Sans&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --midnight: #011627;
+            --white: #fdfffc;
+            --teal: #2ec4b6;
+            --red: #e71d36;
+            --orange: #ff9f1c;
+            --brown: #8B4513;
+            --sand: #F4A460;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Fredoka', sans-serif;
+            background: var(--midnight);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Animated background pattern */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                radial-gradient(circle at 20% 30%, rgba(46, 196, 182, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(255, 159, 28, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 50% 50%, rgba(231, 29, 54, 0.05) 0%, transparent 50%);
+            animation: bgMove 20s ease-in-out infinite;
+        }
+
+        @keyframes bgMove {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            50% { transform: scale(1.1) rotate(5deg); }
+        }
+
+        .container {
+            background: var(--white);
+            border-radius: 40px;
+            padding: 30px;
+            max-width: 1400px;
+            width: 100%;
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .title {
+            font-family: 'Bubblegum Sans', cursive;
+            font-size: 3em;
+            color: var(--teal);
+            margin-bottom: 5px;
+        }
+
+        .subtitle {
+            font-size: 1.3em;
+            color: var(--midnight);
+            font-weight: 600;
+        }
+
+        /* Level Selection Screen */
+        .level-screen {
+            display: block;
+        }
+
+        .level-screen.hidden {
+            display: none;
+        }
+
+        .game-screen {
+            display: none;
+        }
+
+        .game-screen.active {
+            display: block;
+        }
+
+        .level-selection {
+            text-align: center;
+            margin: 50px 0;
+        }
+
+        .level-title {
+            font-size: 2em;
+            color: var(--midnight);
+            margin-bottom: 30px;
+            font-weight: 700;
+        }
+
+        .level-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .level-btn {
+            background: linear-gradient(135deg, var(--teal), var(--orange));
+            color: var(--white);
+            padding: 40px 30px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.8em;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: 'Fredoka', sans-serif;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .level-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .level-btn small {
+            display: block;
+            font-size: 0.5em;
+            margin-top: 10px;
+            opacity: 0.9;
+        }
+
+        /* Game Stats */
+        .game-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, var(--teal), var(--orange));
+            border-radius: 15px;
+            padding: 15px;
+            text-align: center;
+            color: var(--white);
+        }
+
+        .stat-label {
+            font-size: 1em;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-size: 2em;
+            font-weight: 700;
+            font-family: 'Bubblegum Sans', cursive;
+        }
+
+        /* Game Canvas Container */
+        .game-canvas-container {
+            position: relative;
+            background: linear-gradient(to bottom, #87CEEB 0%, #E0F6FF 50%, var(--sand) 100%);
+            border-radius: 20px;
+            overflow: hidden;
+            margin-bottom: 20px;
+            box-shadow: inset 0 5px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        #gameCanvas {
+            display: block;
+            width: 100%;
+            height: 500px;
+            cursor: crosshair;
+        }
+
+        /* Controls */
+        .controls {
+            background: var(--midnight);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+
+        .control-group {
+            margin-bottom: 20px;
+        }
+
+        .control-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .control-label {
+            color: var(--white);
+            font-size: 1.3em;
+            font-weight: 700;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .slider {
+            flex: 1;
+            height: 15px;
+            border-radius: 10px;
+            background: var(--white);
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .vertical-slider {
+            writing-mode: bt-lr; /* IE */
+            -webkit-appearance: slider-vertical; /* Chromium */
+            width: 15px;
+            height: 250px;
+            flex: none;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: var(--teal);
+            cursor: pointer;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .slider::-moz-range-thumb {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: var(--teal);
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .slider-value {
+            color: var(--white);
+            font-size: 1.5em;
+            font-weight: 700;
+            min-width: 60px;
+            text-align: center;
+        }
+
+        /* Launch Area */
+        .launch-area {
+            background: linear-gradient(135deg, var(--orange), var(--red));
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .launch-instruction {
+            color: var(--white);
+            font-size: 1.5em;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .launch-zone {
+            background: var(--white);
+            border: 5px dashed var(--midnight);
+            border-radius: 20px;
+            height: 150px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+
+        .launch-zone:hover {
+            background: rgba(253, 255, 252, 0.8);
+            transform: scale(1.02);
+        }
+
+        .launch-zone.active {
+            background: var(--teal);
+            border-color: var(--white);
+        }
+
+        .rock-indicator {
+            font-size: 4em;
+            transition: transform 0.1s;
+        }
+
+        .power-meter {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 0%;
+            background: linear-gradient(to top, var(--teal), var(--orange));
+            transition: height 0.1s;
+            opacity: 0.7;
+        }
+
+        .aim-arrow {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        /* Game Buttons */
+        .game-controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 15px 35px;
+            font-size: 1.3em;
+            font-weight: 700;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-family: 'Fredoka', sans-serif;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-primary {
+            background: var(--teal);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background: var(--orange);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-secondary {
+            background: var(--orange);
+            color: var(--white);
+        }
+
+        .btn-secondary:hover {
+            background: var(--red);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Winner Modal */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(1, 22, 39, 0.9);
+            display: none;
+            z-index: 2000;
+        }
+
+        .overlay.show {
+            display: block;
+        }
+
+        .result-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            background: var(--white);
+            border-radius: 40px;
+            padding: 60px;
+            text-align: center;
+            z-index: 2001;
+            transition: transform 0.3s;
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
+            max-width: 600px;
+        }
+
+        .result-modal.show {
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .result-modal h2 {
+            font-family: 'Bubblegum Sans', cursive;
+            font-size: 3em;
+            color: var(--teal);
+            margin-bottom: 20px;
+        }
+
+        .result-modal p {
+            font-size: 1.5em;
+            color: var(--midnight);
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .bible-verse {
+            background: var(--midnight);
+            color: var(--white);
+            padding: 20px;
+            border-radius: 15px;
+            font-size: 1.2em;
+            margin: 20px 0;
+            font-style: italic;
+        }
+
+        /* Fireworks */
+        .fireworks {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1999;
+        }
+
+        .firework {
+            position: absolute;
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            animation: explode 1s ease-out forwards;
+        }
+
+        @keyframes explode {
+            0% {
+                transform: translate(0, 0) scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(var(--tx), var(--ty)) scale(0);
+                opacity: 0;
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+
+            .title {
+                font-size: 2em;
+            }
+
+            .game-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            #gameCanvas {
+                height: 350px;
+            }
+
+            .game-controls {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Level Selection Screen -->
+        <div id="levelScreen" class="level-screen">
+            <div class="header">
+                <h1 class="title">🏰 Walls of Jericho 🏰</h1>
+                <p class="subtitle">Break down the walls with Joshua!</p>
+            </div>
+
+            <div class="level-selection">
+                <h2 class="level-title">Choose Your Level</h2>
+                <div class="level-buttons">
+                    <button class="level-btn" onclick="startLevel(1)">
+                        😊 Level 1
+                        <small>Small Wall</small>
+                    </button>
+                    <button class="level-btn" onclick="startLevel(2)">
+                        🤔 Level 2
+                        <small>Medium Wall</small>
+                    </button>
+                    <button class="level-btn" onclick="startLevel(3)">
+                        🔥 Level 3
+                        <small>Large Wall</small>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Game Screen -->
+        <div id="gameScreen" class="game-screen">
+            <div class="header">
+                <h1 class="title">🏰 Walls of Jericho 🏰</h1>
+                <p class="subtitle">Level <span id="currentLevel">1</span></p>
+            </div>
+
+            <!-- Game Stats -->
+            <div class="game-stats">
+                <div class="stat-card">
+                    <div class="stat-label">Rocks Left</div>
+                    <div class="stat-value" id="rocksLeft">7</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Score</div>
+                    <div class="stat-value" id="score">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Blocks Left</div>
+                    <div class="stat-value" id="blocksLeft">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Bonus Hits</div>
+                    <div class="stat-value" id="bonusHits">0</div>
+                </div>
+            </div>
+
+            <!-- Game Canvas -->
+            <div class="game-canvas-container">
+                <canvas id="gameCanvas"></canvas>
+            </div>
+
+            <!-- Controls -->
+            <div class="controls">
+                <div class="control-group" style="display: flex; gap: 30px; align-items: center;">
+                    <!-- Vertical Angle Slider -->
+                    <div style="display: flex; flex-direction: column; align-items: center;">
+                        <label class="control-label" style="margin-bottom: 10px;">Angle</label>
+                        <span class="slider-value" style="margin-bottom: 10px;">↑</span>
+                        <input type="range" id="angleSlider" class="slider vertical-slider" min="-45" max="45" value="0" step="1" orient="vertical">
+                        <span class="slider-value" style="margin-top: 10px;" id="angleValue">0°</span>
+                        <span class="slider-value" style="margin-top: 5px;">↓</span>
+                    </div>
+
+                    <!-- Launch Zone -->
+                    <div style="flex: 1;">
+                        <div class="launch-instruction">Pull Down to Set Power, Release to Launch! 🎺</div>
+                        <div id="launchZone" class="launch-zone">
+                            <span class="rock-indicator">🪨</span>
+                            <div id="powerMeter" class="power-meter"></div>
+                            <canvas id="aimArrow" class="aim-arrow"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Game Controls -->
+            <div class="game-controls">
+                <button class="btn btn-primary" onclick="resetLevel()">🔄 Reset Level</button>
+                <button class="btn btn-secondary" onclick="changeLevelScreen()">📊 Change Level</button>
+            </div>
+        </div>
+
+        <!-- Result Modal -->
+        <div id="overlay" class="overlay"></div>
+        <div id="resultModal" class="result-modal">
+            <h2 id="resultTitle">🎉 Victory! 🎉</h2>
+            <p id="resultMessage"></p>
+            <div class="bible-verse" id="bibleVerse">
+                "By faith the walls of Jericho fell, after the army had marched around them for seven days." - Hebrews 11:30
+            </div>
+            <p>Final Score: <span id="finalScore">0</span></p>
+            <button class="btn btn-primary" onclick="closeResultModal()">Continue</button>
+        </div>
+
+        <!-- Fireworks Container -->
+        <div id="fireworksContainer" class="fireworks"></div>
+    </div>
+
+    <script>
+        // Game configuration
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // Set canvas size
+        function resizeCanvas() {
+            const container = canvas.parentElement;
+            canvas.width = container.clientWidth;
+            canvas.height = 500;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        // Game state
+        let currentLevel = 1;
+        let rocksRemaining = 7;
+        let score = 0;
+        let bonusHitsCount = 0;
+        let wallBlocks = [];
+        let bonusTargets = [];
+        let projectile = null;
+        let isLaunching = false;
+        let launchPower = 0;
+        let angle = 0;
+        let gameActive = false;
+
+        // People sprites (simplified)
+        const people = [];
+
+        // Level configurations
+        const levelConfigs = {
+            1: { 
+                rows: 3, 
+                cols: 6, 
+                bonusCount: 2,
+                blockHealth: 1,
+                requiredDestruction: 0.7
+            },
+            2: { 
+                rows: 4, 
+                cols: 8, 
+                bonusCount: 3,
+                blockHealth: 1,
+                requiredDestruction: 0.75
+            },
+            3: { 
+                rows: 5, 
+                cols: 10, 
+                bonusCount: 4,
+                blockHealth: 1,
+                requiredDestruction: 0.8
+            }
+        };
+
+        // Start level
+        function startLevel(level) {
+            currentLevel = level;
+            document.getElementById('levelScreen').classList.add('hidden');
+            document.getElementById('gameScreen').classList.add('active');
+            document.getElementById('currentLevel').textContent = level;
+            initGame();
+        }
+
+        function changeLevelScreen() {
+            document.getElementById('gameScreen').classList.remove('active');
+            document.getElementById('levelScreen').classList.remove('hidden');
+        }
+
+        function resetLevel() {
+            initGame();
+        }
+
+        // Initialize game
+        function initGame() {
+            rocksRemaining = 7;
+            score = 0;
+            bonusHitsCount = 0;
+            projectile = null;
+            isLaunching = false;
+            launchPower = 0;
+            gameActive = true;
+
+            createWall();
+            createPeople();
+            updateStats();
+            gameLoop();
+        }
+
+        // Create wall blocks
+        function createWall() {
+            wallBlocks = [];
+            bonusTargets = [];
+
+            const config = levelConfigs[currentLevel];
+            const blockWidth = 60;
+            const blockHeight = 40;
+            const startX = canvas.width - (config.cols * blockWidth) - 100;
+            const startY = canvas.height - (config.rows * blockHeight) - 100;
+
+            for (let row = 0; row < config.rows; row++) {
+                for (let col = 0; col < config.cols; col++) {
+                    wallBlocks.push({
+                        x: startX + col * blockWidth,
+                        y: startY + row * blockHeight,
+                        width: blockWidth,
+                        height: blockHeight,
+                        health: config.blockHealth,
+                        maxHealth: config.blockHealth,
+                        destroyed: false,
+                        falling: false,
+                        vx: 0,
+                        vy: 0,
+                        rotation: 0,
+                        rotationSpeed: 0,
+                        onGround: false
+                    });
+                }
+            }
+
+            // Add bonus targets
+            const bonusIndices = [];
+            while (bonusIndices.length < config.bonusCount) {
+                const index = Math.floor(Math.random() * wallBlocks.length);
+                if (!bonusIndices.includes(index)) {
+                    bonusIndices.push(index);
+                    bonusTargets.push(index);
+                }
+            }
+        }
+
+        // Create people (Joshua and Israelites)
+        function createPeople() {
+            people.length = 0;
+            const numPeople = 5;
+            for (let i = 0; i < numPeople; i++) {
+                people.push({
+                    x: 50 + i * 60,
+                    y: canvas.height - 80,
+                    size: 40
+                });
+            }
+        }
+
+        // Update stats display
+        function updateStats() {
+            document.getElementById('rocksLeft').textContent = rocksRemaining;
+            document.getElementById('score').textContent = score;
+            document.getElementById('bonusHits').textContent = bonusHitsCount;
+            
+            const activeBlocks = wallBlocks.filter(b => !b.destroyed).length;
+            document.getElementById('blocksLeft').textContent = activeBlocks;
+        }
+
+        // Angle slider
+        document.getElementById('angleSlider').addEventListener('input', (e) => {
+            angle = parseInt(e.target.value);
+            document.getElementById('angleValue').textContent = angle + '°';
+            drawAimArrow();
+        });
+
+        // Aim arrow canvas
+        const aimArrowCanvas = document.getElementById('aimArrow');
+        const aimArrowCtx = aimArrowCanvas.getContext('2d');
+
+        function initAimArrow() {
+            aimArrowCanvas.width = launchZone.offsetWidth;
+            aimArrowCanvas.height = launchZone.offsetHeight;
+            drawAimArrow();
+        }
+
+        function drawAimArrow() {
+            aimArrowCtx.clearRect(0, 0, aimArrowCanvas.width, aimArrowCanvas.height);
+            
+            const centerX = aimArrowCanvas.width / 2;
+            const centerY = aimArrowCanvas.height / 2;
+            const arrowLength = 80;
+            
+            // Convert angle (vertical slider goes up for positive, down for negative)
+            // Negative angle = aim up/left, Positive angle = aim up/right
+            const angleRad = (angle * Math.PI) / 180;
+            const endX = centerX + Math.sin(angleRad) * arrowLength;
+            const endY = centerY - Math.cos(angleRad) * arrowLength;
+            
+            // Draw arrow line
+            aimArrowCtx.strokeStyle = '#e71d36';
+            aimArrowCtx.lineWidth = 4;
+            aimArrowCtx.beginPath();
+            aimArrowCtx.moveTo(centerX, centerY);
+            aimArrowCtx.lineTo(endX, endY);
+            aimArrowCtx.stroke();
+            
+            // Draw arrow head
+            const headLength = 15;
+            const headAngle = Math.PI / 6;
+            
+            aimArrowCtx.beginPath();
+            aimArrowCtx.moveTo(endX, endY);
+            aimArrowCtx.lineTo(
+                endX - headLength * Math.cos(angleRad - headAngle),
+                endY + headLength * Math.sin(angleRad - headAngle)
+            );
+            aimArrowCtx.moveTo(endX, endY);
+            aimArrowCtx.lineTo(
+                endX - headLength * Math.cos(angleRad + headAngle),
+                endY + headLength * Math.sin(angleRad + headAngle)
+            );
+            aimArrowCtx.stroke();
+        }
+
+        // Initialize aim arrow when DOM is ready
+        setTimeout(initAimArrow, 100);
+
+        // Launch zone interaction
+        const launchZone = document.getElementById('launchZone');
+        const powerMeter = document.getElementById('powerMeter');
+        const rockIndicator = document.querySelector('.rock-indicator');
+
+        let isDragging = false;
+        let startY = 0;
+
+        launchZone.addEventListener('mousedown', startDrag);
+        launchZone.addEventListener('touchstart', startDrag);
+
+        document.addEventListener('mousemove', drag);
+        document.addEventListener('touchmove', drag);
+
+        document.addEventListener('mouseup', endDrag);
+        document.addEventListener('touchend', endDrag);
+
+        function startDrag(e) {
+            if (!gameActive || rocksRemaining <= 0 || projectile) return;
+            
+            isDragging = true;
+            launchZone.classList.add('active');
+            startY = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY;
+            e.preventDefault();
+        }
+
+        function drag(e) {
+            if (!isDragging) return;
+            
+            const currentY = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY;
+            const deltaY = Math.max(0, currentY - startY);
+            launchPower = Math.min(100, (deltaY / 150) * 100);
+            
+            powerMeter.style.height = launchPower + '%';
+            rockIndicator.style.transform = `translateY(${deltaY * 0.3}px) scale(${1 + launchPower / 200})`;
+            
+            e.preventDefault();
+        }
+
+        function endDrag(e) {
+            if (!isDragging) return;
+            
+            isDragging = false;
+            launchZone.classList.remove('active');
+            
+            if (launchPower > 10) {
+                launchRock();
+                playTrumpetSound();
+            }
+            
+            powerMeter.style.height = '0%';
+            rockIndicator.style.transform = '';
+            launchPower = 0;
+            
+            e.preventDefault();
+        }
+
+        // Launch rock
+        function launchRock() {
+            if (rocksRemaining <= 0 || projectile) return;
+
+            rocksRemaining--;
+            updateStats();
+
+            const speed = 5 + (launchPower / 10);
+            const angleRad = (angle * Math.PI) / 180;
+
+            projectile = {
+                x: 100,
+                y: canvas.height - 150,
+                vx: Math.cos(angleRad) * speed,
+                vy: -Math.sin(angleRad) * speed - (launchPower / 10),
+                size: 20,
+                gravity: 0.15,
+                active: true
+            };
+        }
+
+        // Game loop
+        function gameLoop() {
+            if (!gameActive) return;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw sky and ground gradient
+            const skyGradient = ctx.createLinearGradient(0, 0, 0, canvas.height * 0.6);
+            skyGradient.addColorStop(0, '#87CEEB');
+            skyGradient.addColorStop(1, '#E0F6FF');
+            ctx.fillStyle = skyGradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height * 0.6);
+
+            const groundGradient = ctx.createLinearGradient(0, canvas.height * 0.6, 0, canvas.height);
+            groundGradient.addColorStop(0, '#E0C097');
+            groundGradient.addColorStop(1, '#C19A6B');
+            ctx.fillStyle = groundGradient;
+            ctx.fillRect(0, canvas.height * 0.6, canvas.width, canvas.height * 0.4);
+
+            // Draw people
+            drawPeople();
+
+            // Draw wall blocks
+            drawWall();
+
+            // Draw angle indicator arrow on canvas
+            drawCanvasAngleArrow();
+
+            // Update and draw projectile
+            if (projectile && projectile.active) {
+                updateProjectile();
+                drawProjectile();
+            }
+
+            // Check win/loss conditions
+            checkGameStatus();
+
+            requestAnimationFrame(gameLoop);
+        }
+
+        function drawPeople() {
+            people.forEach((person, index) => {
+                // Body
+                ctx.fillStyle = index === 0 ? '#8B4513' : '#D2691E';
+                ctx.fillRect(person.x, person.y, person.size * 0.6, person.size);
+
+                // Head
+                ctx.fillStyle = '#FDBCB4';
+                ctx.beginPath();
+                ctx.arc(person.x + person.size * 0.3, person.y - 10, person.size * 0.3, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Joshua's staff (first person)
+                if (index === 0) {
+                    ctx.strokeStyle = '#654321';
+                    ctx.lineWidth = 3;
+                    ctx.beginPath();
+                    ctx.moveTo(person.x + person.size * 0.7, person.y);
+                    ctx.lineTo(person.x + person.size * 0.7, person.y - person.size * 1.5);
+                    ctx.stroke();
+                }
+            });
+        }
+
+        function drawWall() {
+            const groundLevel = canvas.height - 50;
+            
+            wallBlocks.forEach((block, index) => {
+                // Update physics for falling blocks
+                if (block.falling && !block.onGround) {
+                    block.x += block.vx;
+                    block.y += block.vy;
+                    block.vy += 0.3; // Gravity
+                    block.rotation += block.rotationSpeed;
+                    
+                    // Friction
+                    block.vx *= 0.99;
+                    
+                    // Check if hit ground
+                    if (block.y + block.height >= groundLevel) {
+                        block.y = groundLevel - block.height;
+                        block.vy = 0;
+                        block.vx *= 0.5; // Friction on ground
+                        block.onGround = true;
+                        block.rotationSpeed *= 0.5;
+                    }
+                    
+                    // Block-to-block collision for fallen blocks
+                    wallBlocks.forEach((otherBlock, otherIndex) => {
+                        if (index === otherIndex || !otherBlock.falling) return;
+                        
+                        const dx = block.x - otherBlock.x;
+                        const dy = block.y - otherBlock.y;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+                        const minDist = (block.width + block.height) / 2;
+                        
+                        if (distance < minDist && distance > 0) {
+                            // Simple collision response
+                            const angle = Math.atan2(dy, dx);
+                            const force = (minDist - distance) * 0.1;
+                            block.vx += Math.cos(angle) * force;
+                            block.vy += Math.sin(angle) * force;
+                        }
+                    });
+                }
+                
+                // Don't draw blocks that are no longer visible (off screen bottom)
+                if (block.y > canvas.height + 100) return;
+
+                const isBonus = bonusTargets.includes(index);
+                const healthPercent = block.health / block.maxHealth;
+
+                // Block color based on health and bonus status
+                let blockColor = '#8B7355';
+                if (block.destroyed) {
+                    blockColor = '#6B5345'; // Darker when destroyed
+                }
+                if (isBonus && !block.destroyed) {
+                    blockColor = '#FFD700'; // Gold for bonus
+                } else if (isBonus && block.destroyed) {
+                    blockColor = '#DAA520'; // Darker gold when destroyed
+                }
+
+                ctx.save();
+                
+                // Apply rotation for falling blocks
+                if (block.falling) {
+                    ctx.translate(block.x + block.width / 2, block.y + block.height / 2);
+                    ctx.rotate(block.rotation);
+                    ctx.fillStyle = blockColor;
+                    ctx.fillRect(-block.width / 2, -block.height / 2, block.width, block.height);
+                    
+                    // Block outline
+                    ctx.strokeStyle = '#5C4033';
+                    ctx.lineWidth = 2;
+                    ctx.strokeRect(-block.width / 2, -block.height / 2, block.width, block.height);
+                    
+                    // Cracks for destroyed blocks
+                    if (block.destroyed) {
+                        ctx.strokeStyle = '#3C2F2F';
+                        ctx.lineWidth = 2;
+                        ctx.beginPath();
+                        ctx.moveTo(-block.width / 2 + 10, -block.height / 2);
+                        ctx.lineTo(-block.width / 2 + 20, block.height / 2);
+                        ctx.moveTo(block.width / 2 - 15, -block.height / 2);
+                        ctx.lineTo(block.width / 2 - 10, block.height / 2);
+                        ctx.stroke();
+                    }
+                } else {
+                    // Draw static blocks normally
+                    ctx.fillStyle = blockColor;
+                    ctx.fillRect(block.x, block.y, block.width, block.height);
+
+                    // Block outline
+                    ctx.strokeStyle = '#5C4033';
+                    ctx.lineWidth = 2;
+                    ctx.strokeRect(block.x, block.y, block.width, block.height);
+                }
+
+                // Bonus star (only on non-destroyed blocks)
+                if (isBonus && !block.destroyed && !block.falling) {
+                    ctx.fillStyle = '#FFD700';
+                    ctx.font = 'bold 20px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('⭐', 0, 7);
+                }
+                
+                ctx.restore();
+            });
+        }
+
+        function updateProjectile() {
+            if (!projectile || !projectile.active) return;
+
+            projectile.x += projectile.vx;
+            projectile.y += projectile.vy;
+            projectile.vy += projectile.gravity;
+
+            // Check collision with wall - projectile passes through, breaking blocks
+            wallBlocks.forEach((block, index) => {
+                if (block.destroyed) return;
+
+                if (projectile.x + projectile.size > block.x &&
+                    projectile.x < block.x + block.width &&
+                    projectile.y + projectile.size > block.y &&
+                    projectile.y < block.y + block.height) {
+                    
+                    // Hit! Mark as destroyed and apply physics
+                    if (!block.falling) {
+                        block.destroyed = true;
+                        block.falling = true;
+                        
+                        // Calculate impact force based on projectile velocity
+                        const impactForce = Math.sqrt(projectile.vx * projectile.vx + projectile.vy * projectile.vy);
+                        
+                        // Apply velocity to block based on projectile direction
+                        block.vx = projectile.vx * 0.5;
+                        block.vy = projectile.vy * 0.3 - 2; // Add some upward force
+                        block.rotationSpeed = (Math.random() - 0.5) * 0.3;
+                        
+                        score += 10;
+
+                        // Check if bonus target
+                        if (bonusTargets.includes(index)) {
+                            score += 50;
+                            bonusHitsCount++;
+                        }
+
+                        updateStats();
+                        playImpactSound();
+                        
+                        // Apply force to nearby blocks (collision chain reaction)
+                        applyForceToNearbyBlocks(block, index, impactForce);
+                    }
+                }
+            });
+
+            // Check if off screen
+            if (projectile && (projectile.x > canvas.width || projectile.y > canvas.height || projectile.x < 0)) {
+                projectile.active = false;
+                projectile = null;
+            }
+        }
+
+        function applyForceToNearbyBlocks(hitBlock, hitIndex, force) {
+            const chainRange = 80; // How far the force spreads
+            
+            wallBlocks.forEach((block, index) => {
+                if (index === hitIndex || block.destroyed || block.falling) return;
+                
+                // Calculate distance
+                const dx = block.x - hitBlock.x;
+                const dy = block.y - hitBlock.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                
+                if (distance < chainRange) {
+                    // Apply force based on distance (closer = more force)
+                    const forceFactor = (1 - distance / chainRange) * force * 0.3;
+                    
+                    block.destroyed = true;
+                    block.falling = true;
+                    
+                    // Push block away from impact
+                    const angle = Math.atan2(dy, dx);
+                    block.vx = Math.cos(angle) * forceFactor;
+                    block.vy = Math.sin(angle) * forceFactor - 1;
+                    block.rotationSpeed = (Math.random() - 0.5) * 0.2;
+                    
+                    score += 5; // Bonus points for chain reaction
+                    updateStats();
+                }
+            });
+        }
+
+        function drawProjectile() {
+            if (!projectile || !projectile.active) return;
+
+            ctx.fillStyle = '#696969';
+            ctx.beginPath();
+            ctx.arc(projectile.x, projectile.y, projectile.size, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Rock texture
+            ctx.fillStyle = '#505050';
+            ctx.beginPath();
+            ctx.arc(projectile.x - 5, projectile.y - 5, 5, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        function drawCanvasAngleArrow() {
+            // Draw the angle arrow on the left side of the canvas showing launch trajectory
+            const launchX = 100;
+            const launchY = canvas.height - 150;
+            const arrowLength = 120;
+            
+            // Convert angle to radians (angle is from slider)
+            const angleRad = (angle * Math.PI) / 180;
+            const endX = launchX + Math.cos(angleRad) * arrowLength;
+            const endY = launchY - Math.sin(angleRad) * arrowLength;
+            
+            // Draw arrow line
+            ctx.strokeStyle = '#e71d36';
+            ctx.lineWidth = 5;
+            ctx.setLineDash([]);
+            ctx.beginPath();
+            ctx.moveTo(launchX, launchY);
+            ctx.lineTo(endX, endY);
+            ctx.stroke();
+            
+            // Draw arrow head
+            const headLength = 20;
+            const headAngle = Math.PI / 6;
+            
+            ctx.fillStyle = '#e71d36';
+            ctx.beginPath();
+            ctx.moveTo(endX, endY);
+            ctx.lineTo(
+                endX - headLength * Math.cos(angleRad - headAngle),
+                endY + headLength * Math.sin(angleRad - headAngle)
+            );
+            ctx.lineTo(
+                endX - headLength * Math.cos(angleRad + headAngle),
+                endY + headLength * Math.sin(angleRad + headAngle)
+            );
+            ctx.closePath();
+            ctx.fill();
+
+            // Draw angle label
+            ctx.fillStyle = '#fff';
+            ctx.strokeStyle = '#011627';
+            ctx.lineWidth = 3;
+            ctx.font = 'bold 24px Fredoka';
+            ctx.textAlign = 'center';
+            ctx.strokeText(angle + '°', launchX + 40, launchY - 80);
+            ctx.fillText(angle + '°', launchX + 40, launchY - 80);
+        }
+
+        function checkGameStatus() {
+            const config = levelConfigs[currentLevel];
+            const totalBlocks = wallBlocks.length;
+            const destroyedBlocks = wallBlocks.filter(b => b.destroyed).length;
+            const destructionPercent = destroyedBlocks / totalBlocks;
+
+            // Win condition
+            if (destructionPercent >= config.requiredDestruction) {
+                gameActive = false;
+                setTimeout(() => showResult(true), 500);
+            }
+
+            // Loss condition
+            if (rocksRemaining === 0 && !projectile && destructionPercent < config.requiredDestruction) {
+                gameActive = false;
+                setTimeout(() => showResult(false), 500);
+            }
+        }
+
+        // Update stats display to show non-destroyed blocks
+        function updateStats() {
+            document.getElementById('rocksLeft').textContent = rocksRemaining;
+            document.getElementById('score').textContent = score;
+            document.getElementById('bonusHits').textContent = bonusHitsCount;
+            
+            const activeBlocks = wallBlocks.filter(b => !b.destroyed).length;
+            document.getElementById('blocksLeft').textContent = activeBlocks;
+        }
+
+        function showResult(won) {
+            const modal = document.getElementById('resultModal');
+            const overlay = document.getElementById('overlay');
+            const title = document.getElementById('resultTitle');
+            const message = document.getElementById('resultMessage');
+
+            if (won) {
+                title.textContent = '🎉 Victory! The Walls Have Fallen! 🎉';
+                message.textContent = `You destroyed the walls of Jericho with ${7 - rocksRemaining} rocks!`;
+                launchFireworks();
+            } else {
+                title.textContent = '💪 Keep Trying! 💪';
+                message.textContent = 'The walls still stand. Try again with better aim and power!';
+            }
+
+            document.getElementById('finalScore').textContent = score;
+            overlay.classList.add('show');
+            modal.classList.add('show');
+        }
+
+        function closeResultModal() {
+            document.getElementById('overlay').classList.remove('show');
+            document.getElementById('resultModal').classList.remove('show');
+            changeLevelScreen();
+        }
+
+        // Sound effects (using Web Audio API)
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playTrumpetSound() {
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+
+            oscillator.frequency.value = 440;
+            oscillator.type = 'sine';
+
+            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.5);
+        }
+
+        function playImpactSound() {
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+
+            oscillator.frequency.value = 100;
+            oscillator.type = 'sawtooth';
+
+            gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.3);
+        }
+
+        // Fireworks
+        function launchFireworks() {
+            const container = document.getElementById('fireworksContainer');
+            const colors = ['#2ec4b6', '#ff9f1c', '#e71d36', '#fdfffc'];
+            
+            for (let i = 0; i < 15; i++) {
+                setTimeout(() => {
+                    createFirework(container, colors);
+                }, i * 300);
+            }
+        }
+
+        function createFirework(container, colors) {
+            const x = Math.random() * window.innerWidth;
+            const y = Math.random() * (window.innerHeight * 0.5);
+            
+            for (let i = 0; i < 20; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'firework';
+                particle.style.left = x + 'px';
+                particle.style.top = y + 'px';
+                particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                
+                const angle = (Math.PI * 2 * i) / 20;
+                const velocity = 50 + Math.random() * 100;
+                const tx = Math.cos(angle) * velocity;
+                const ty = Math.sin(angle) * velocity;
+                
+                particle.style.setProperty('--tx', tx + 'px');
+                particle.style.setProperty('--ty', ty + 'px');
+                
+                container.appendChild(particle);
+                
+                setTimeout(() => {
+                    particle.remove();
+                }, 1000);
+            }
+        }
+    </script>
+</body>
+</html>
