@@ -1,0 +1,20 @@
+:root {
+  --midnight: #011627;
+  --white: #fdfffc;
+  --teal: #2ec4b6;
+  --red: #e71d36;
+  --orange: #ff9f1c;
+}
+
+.title {
+  font-family: "Bubblegum Sans", cursive;
+  font-size: 3.5em;
+  color: var(--teal);
+  margin-bottom: 10px;
+}
+
+#title-box {
+  background-color: rgba(255, 255, 255, 0.684);
+  border-radius: 20px;
+  padding: 1%;
+}

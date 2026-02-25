@@ -4,7 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>David's Sling</title>
+<link rel="stylesheet" href="styles.css">
 <style>
+
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { background: #011627; overflow: hidden; font-family: 'Georgia', serif; }
   canvas { display: block; }
@@ -17,6 +19,7 @@
     background: rgba(1,22,39,0.75); border: 2px solid #2ec4b6;
     border-radius: 12px; padding: 8px 22px; color: #2ec4b6;
     font-size: 1.5rem; font-weight: bold; letter-spacing: 1px;
+    margin-top: 80px;
   }
   #title-box {
     color: #fdfffc; font-size: 1.4rem; text-align: center;
@@ -27,6 +30,7 @@
     background: rgba(1,22,39,0.75); border: 2px solid #2ec4b6;
     border-radius: 12px; padding: 8px 18px; color: #fdfffc;
     font-size: 1.2rem;
+        margin-top: 80px;
   }
   #msg {
     position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%);
@@ -47,12 +51,51 @@
     position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%);
     color: rgba(253,255,252,0.6); font-size: 1rem; z-index: 10; pointer-events: none;
   }
+
+  
+        /* Home Button */
+.home-button {
+    position: absolute;
+    top: 30px;
+    right: 30px;
+    background: var(--orange);
+    color: var(--white);
+    padding: 15px 30px;
+    border: none;
+    border-radius: 15px;
+    font-size: 1.3em;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: 'Fredoka', sans-serif;
+    transition: all 0.3s;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    text-decoration: none;
+    display: inline-block;
+    pointer-events: auto;
+}
+
+.home-button:hover {
+    background: var(--teal);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+}
+
+@media (max-width: 768px) {
+    .home-button {
+        top: 15px;
+        right: 15px;
+        padding: 10px 20px;
+        font-size: 1.1em;
+    }
+}
 </style>
 </head>
 <body>
 <div id="ui">
+  <a href="index.html" class="home-button">🏠 Home</a>
   <div id="score-box">Score: <span id="score-val">0</span></div>
-  <div id="title-box">⭐ <span>David's Sling</span> ⭐<br><small style="font-size:0.75rem;color:#ccc;">Aim & tap to launch!</small></div>
+  
+  <div id="title-box"><h1 class="title">David vs. Goliath</h1><small style="font-size:0.75rem;color:black;">Aim & tap to launch!</small></div>
  <div id="stones-box"><svg width="32" height="32" viewBox="0 0 100 100" style="vertical-align:middle;margin-right:6px"><ellipse cx="50" cy="78" rx="36" ry="10" fill="#7a6040" opacity="0.5"/><polygon points="15,68 10,45 22,28 38,15 58,12 75,22 88,40 85,62 70,72 35,74" fill="#c8a46a"/><polygon points="22,28 38,15 58,12 62,30 45,35 25,40" fill="#d4b47a"/><polygon points="58,12 75,22 88,40 78,38 65,28 62,30" fill="#b8944a"/><polygon points="85,62 70,72 68,55 78,38 88,40" fill="#a07838"/><polygon points="15,68 10,45 22,28 25,40 18,55" fill="#b89458"/><polygon points="38,22 50,18 55,28 42,32" fill="#e0c48a" opacity="0.7"/></svg><span id="stones-val">5</span></div>
 </div>
 <div id="msg"><span class="big" id="msg-title">Well done!</span><span id="msg-body"></span></div>
@@ -125,6 +168,7 @@ function addRock(x, y, z, s) {
 }
 [-8,-5,4,9,-12,11].forEach((x,i) => addRock(x, 0.3, -2+i*0.5, 0.3+Math.random()*0.3));
 
+
 // ── Goliath (target dummy) ────────────────────────────────────
 const goliathGroup = new THREE.Group();
 scene.add(goliathGroup);
@@ -135,89 +179,93 @@ function makeMesh(geo, color, castShadow=true) {
   return m;
 }
 
-// Body (wider, taller)
-const body = makeMesh(new THREE.CylinderGeometry(1.1, 0.88, 2.9, 12), 0x8B4513);
-body.position.y = 2.45;
+// Body
+const body = makeMesh(new THREE.CylinderGeometry(0.9, 0.7, 2.4, 12), 0x8B4513);
+body.position.y = 2.2;
 goliathGroup.add(body);
-// Armor plate (large, dark)
-const armor = makeMesh(new THREE.BoxGeometry(2.1, 2.1, 0.34), 0x555555);
-armor.position.set(0, 2.45, 0.72);
+// Armor plate
+const armor = makeMesh(new THREE.BoxGeometry(1.6, 1.8, 0.3), 0x888888);
+armor.position.set(0, 2.2, 0.7);
 goliathGroup.add(armor);
-// Shoulder pads
-[-1.15, 1.15].forEach(x => {
-  const pad = makeMesh(new THREE.SphereGeometry(0.48, 10, 8), 0x444444);
-  pad.scale.set(1, 0.6, 0.9);
-  pad.position.set(x, 3.7, 0.1);
-  goliathGroup.add(pad);
-});
-// Head (bigger, darker skin)
-const head = makeMesh(new THREE.SphereGeometry(0.8, 12, 10), 0xb87050);
-head.position.y = 4.65;
+// Head
+const head = makeMesh(new THREE.SphereGeometry(0.65, 12, 10), 0xdaa07a);
+head.position.y = 4.1;
 goliathGroup.add(head);
-// Helmet (wider, darker)
-const helmet = makeMesh(new THREE.CylinderGeometry(0.64, 0.84, 0.56, 12), 0x444444);
-helmet.position.y = 5.15;
+// Helmet
+const helmet = makeMesh(new THREE.CylinderGeometry(0.5, 0.68, 0.5, 12), 0x777777);
+helmet.position.y = 4.55;
 goliathGroup.add(helmet);
-const helmetTop = makeMesh(new THREE.SphereGeometry(0.64, 12, 8, 0, Math.PI*2, 0, Math.PI/2), 0x444444);
-helmetTop.position.y = 5.44;
+const helmetTop = makeMesh(new THREE.SphereGeometry(0.5, 12, 8, 0, Math.PI*2, 0, Math.PI/2), 0x777777);
+helmetTop.position.y = 4.8;
 goliathGroup.add(helmetTop);
-// Helmet spike
-const helmetSpike = makeMesh(new THREE.ConeGeometry(0.14, 0.9, 8), 0x888888);
-helmetSpike.position.y = 5.98;
-goliathGroup.add(helmetSpike);
-// Eyes (menacing deep red)
-[-0.3, 0.3].forEach(x => {
-  const eye = makeMesh(new THREE.SphereGeometry(0.14, 8, 8), 0x660000);
-  eye.position.set(x, 4.76, 0.74);
-  goliathGroup.add(eye);
+// Eyes - red and angry
+[-0.22, 0.22].forEach(x => {
+  const white = makeMesh(new THREE.SphereGeometry(0.13, 8, 8), 0xdddddd);
+  white.position.set(x, 4.2, 0.58);
+  goliathGroup.add(white);
+  const pupil = makeMesh(new THREE.SphereGeometry(0.07, 8, 8), 0xcc0000);
+  pupil.position.set(x, 4.2, 0.68);
+  goliathGroup.add(pupil);
 });
-// Eyebrows (steep, heavy scowl)
-[-0.3, 0.3].forEach((x,i) => {
-  const brow = makeMesh(new THREE.BoxGeometry(0.34, 0.12, 0.1), 0x1e1008);
-  brow.position.set(x, 5.02, 0.76);
-  brow.rotation.z = i===0 ? 0.62 : -0.62;
+// Heavy angry eyebrows
+[-0.22, 0.22].forEach((x,i) => {
+  const brow = makeMesh(new THREE.BoxGeometry(0.32, 0.11, 0.1), 0x1a1008);
+  brow.position.set(x, 4.42, 0.6);
+  brow.rotation.z = i===0 ? 0.55 : -0.55;
   goliathGroup.add(brow);
 });
-// Frown
-[-0.2, 0.2].forEach((x,i) => {
-  const frown = makeMesh(new THREE.BoxGeometry(0.24, 0.09, 0.09), 0x1e1008);
-  frown.position.set(x, 4.32, 0.76);
-  frown.rotation.z = i===0 ? -0.55 : 0.55;
-  goliathGroup.add(frown);
+// Scowling mouth
+const mouth = makeMesh(new THREE.BoxGeometry(0.4, 0.1, 0.08), 0x3a1010);
+mouth.position.set(0, 3.88, 0.6);
+mouth.rotation.z = 0.15;
+goliathGroup.add(mouth);
+// Scar across face
+const scar = makeMesh(new THREE.BoxGeometry(0.06, 0.45, 0.06), 0x8a4030);
+scar.position.set(0.18, 4.1, 0.62);
+scar.rotation.z = 0.3;
+goliathGroup.add(scar);
+// Bigger spiked shoulder pads
+[-1.1, 1.1].forEach(x => {
+  const pad = makeMesh(new THREE.CylinderGeometry(0.5, 0.4, 0.3, 8), 0x666666);
+  pad.position.set(x, 3.3, 0);
+  goliathGroup.add(pad);
+  // Spikes on shoulder
+  for (let s = 0; s < 3; s++) {
+    const spike = makeMesh(new THREE.ConeGeometry(0.1, 0.4, 6), 0x444444);
+    spike.position.set(x + (x<0?-0.2:0.2)*s*0.3, 3.55 + s*0.05, s*0.15-0.1);
+    spike.rotation.z = x < 0 ? -0.5 - s*0.2 : 0.5 + s*0.2;
+    goliathGroup.add(spike);
+  }
 });
-// Arms (massive, spread wide)
-[-1.5, 1.5].forEach((x,i) => {
-  const arm = makeMesh(new THREE.CylinderGeometry(0.40, 0.32, 2.3, 8), 0x8B4513);
-  arm.position.set(x, 2.65, 0);
-  arm.rotation.z = x < 0 ? 0.52 : -0.52;
+// Arms
+[-1.1, 1.1].forEach((x,i) => {
+  const arm = makeMesh(new THREE.CylinderGeometry(0.25, 0.2, 1.8, 8), 0x8B4513);
+  arm.position.set(x, 2.4, 0);
+  arm.rotation.z = x < 0 ? 0.4 : -0.4;
   goliathGroup.add(arm);
 });
-// Legs (thick, planted)
-[-0.52, 0.52].forEach(x => {
-  const leg = makeMesh(new THREE.CylinderGeometry(0.38, 0.30, 2.1, 8), 0x6B3410);
-  leg.position.set(x, 1.05, 0);
+// Legs
+[-0.4, 0.4].forEach(x => {
+  const leg = makeMesh(new THREE.CylinderGeometry(0.28, 0.22, 1.8, 8), 0x6B3410);
+  leg.position.set(x, 0.9, 0);
   goliathGroup.add(leg);
 });
-// Shield (large, battle-worn)
-const shield = makeMesh(new THREE.CylinderGeometry(1.05, 1.05, 0.18, 20), 0x7a4a1a);
+// Shield
+const shield = makeMesh(new THREE.CylinderGeometry(0.7, 0.7, 0.15, 20), 0x996633);
 shield.rotation.z = Math.PI/2;
-shield.position.set(-2.1, 2.7, 0.2);
+shield.position.set(-1.6, 2.5, 0.2);
 goliathGroup.add(shield);
-// Shield center boss
-const shieldBoss = makeMesh(new THREE.SphereGeometry(0.24, 8, 8), 0x999999);
-shieldBoss.rotation.z = Math.PI/2;
-shieldBoss.position.set(-2.12, 2.7, 0.2);
-goliathGroup.add(shieldBoss);
-// Spear (long, thick)
-const spearHandle = makeMesh(new THREE.CylinderGeometry(0.1, 0.1, 5.8, 8), 0x7a5810);
-spearHandle.position.set(1.55, 3.6, 0);
+// Spear
+const spearHandle = makeMesh(new THREE.CylinderGeometry(0.07, 0.07, 4, 8), 0x8B6914);
+spearHandle.position.set(1.4, 3.0, 0);
 goliathGroup.add(spearHandle);
-const spearTip = makeMesh(new THREE.ConeGeometry(0.28, 0.95, 8), 0xbbbbbb);
-spearTip.position.set(1.55, 6.7, 0);
+const spearTip = makeMesh(new THREE.ConeGeometry(0.2, 0.6, 8), 0x999999);
+spearTip.position.set(1.4, 5.2, 0);
 goliathGroup.add(spearTip);
 
 goliathGroup.position.set(0, 0, -10);
 goliathGroup.scale.setScalar(1.7);
+
 
 
 // ── Stars (hit effect) ─────────────────────────────────────────
