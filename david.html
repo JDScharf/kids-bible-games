@@ -1,576 +1,759 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>David's Sling</title>
-<link rel="stylesheet" href="styles.css">
-<style>
-
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { background: #011627; overflow: hidden; font-family: 'Georgia', serif; }
-  canvas { display: block; }
-  #ui {
-    position: fixed; top: 0; left: 0; right: 0;
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 16px 28px; pointer-events: none; z-index: 10;
-  }
-  #score-box {
-    background: rgba(1,22,39,0.75); border: 2px solid #2ec4b6;
-    border-radius: 12px; padding: 8px 22px; color: #2ec4b6;
-    font-size: 1.5rem; font-weight: bold; letter-spacing: 1px;
-    margin-top: 80px;
-  }
-  #title-box {
-    color: #fdfffc; font-size: 1.4rem; text-align: center;
-    text-shadow: 0 2px 8px #000;
-  }
-  #title-box span { color: #ff9f1c; }
-  #stones-box {
-    background: rgba(1,22,39,0.75); border: 2px solid #2ec4b6;
-    border-radius: 12px; padding: 8px 18px; color: #fdfffc;
-    font-size: 1.2rem;
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>David's Sling</title>
+    <link rel="stylesheet" href="styles.css" />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        background: #011627;
+        overflow: hidden;
+        font-family: "Georgia", serif;
+      }
+      canvas {
+        display: block;
+      }
+      #ui {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 16px 28px;
+        pointer-events: none;
+        z-index: 10;
+      }
+      #score-box {
+        background: rgba(1, 22, 39, 0.75);
+        border: 2px solid #2ec4b6;
+        border-radius: 12px;
+        padding: 8px 22px;
+        color: #2ec4b6;
+        font-size: 1.5rem;
+        font-weight: bold;
+        letter-spacing: 1px;
         margin-top: 80px;
-  }
-  #msg {
-    position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%);
-    background: rgba(1,22,39,0.92); border: 3px solid #2ec4b6;
-    border-radius: 20px; padding: 32px 48px; color: #fdfffc;
-    font-size: 2rem; text-align: center; z-index: 20;
-    display: none; pointer-events: none;
-  }
-  #msg .big { font-size: 3rem; color: #ff9f1c; display: block; margin-bottom: 8px; }
-  #restart {
-    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
-    background: #ff9f1c; color: #011627; border: none; border-radius: 14px;
-    padding: 14px 44px; font-size: 1.4rem; font-family: Georgia, serif;
-    font-weight: bold; cursor: pointer; z-index: 20; display: none;
-    box-shadow: 0 4px 18px rgba(0,0,0,0.4);
-  }
-  #aim-hint {
-    position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%);
-    color: rgba(253,255,252,0.6); font-size: 1rem; z-index: 10; pointer-events: none;
-  }
+      }
+      #title-box {
+        color: #fdfffc;
+        font-size: 1.4rem;
+        text-align: center;
+        text-shadow: 0 2px 8px #000;
+      }
+      #title-box span {
+        color: #ff9f1c;
+      }
+      #stones-box {
+        background: rgba(1, 22, 39, 0.75);
+        border: 2px solid #2ec4b6;
+        border-radius: 12px;
+        padding: 8px 18px;
+        color: #fdfffc;
+        font-size: 1.2rem;
+        margin-top: 80px;
+      }
+      #msg {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: rgba(1, 22, 39, 0.92);
+        border: 3px solid #2ec4b6;
+        border-radius: 20px;
+        padding: 32px 48px;
+        color: #fdfffc;
+        font-size: 2rem;
+        text-align: center;
+        z-index: 20;
+        display: none;
+        pointer-events: none;
+      }
+      #msg .big {
+        font-size: 3rem;
+        color: #ff9f1c;
+        display: block;
+        margin-bottom: 8px;
+      }
+      #restart {
+        position: fixed;
+        bottom: 24px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #ff9f1c;
+        color: #011627;
+        border: none;
+        border-radius: 14px;
+        padding: 14px 44px;
+        font-size: 1.4rem;
+        font-family: Georgia, serif;
+        font-weight: bold;
+        cursor: pointer;
+        z-index: 20;
+        display: none;
+        box-shadow: 0 4px 18px rgba(0, 0, 0, 0.4);
+      }
+      #aim-hint {
+        position: fixed;
+        bottom: 28px;
+        left: 50%;
+        transform: translateX(-50%);
+        color: rgba(253, 255, 252, 0.6);
+        font-size: 1rem;
+        z-index: 10;
+        pointer-events: none;
+      }
 
-  
-        /* Home Button */
-.home-button {
-    position: absolute;
-    top: 30px;
-    right: 30px;
-    background: var(--orange);
-    color: var(--white);
-    padding: 15px 30px;
-    border: none;
-    border-radius: 15px;
-    font-size: 1.3em;
-    font-weight: 700;
-    cursor: pointer;
-    font-family: 'Fredoka', sans-serif;
-    transition: all 0.3s;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-    text-decoration: none;
-    display: inline-block;
-    pointer-events: auto;
-}
+      /* Home Button */
+      .home-button {
+        position: absolute;
+        top: 30px;
+        right: 30px;
+        background: var(--orange);
+        color: var(--white);
+        padding: 15px 30px;
+        border: none;
+        border-radius: 15px;
+        font-size: 1.3em;
+        font-weight: 700;
+        cursor: pointer;
+        font-family: "Fredoka", sans-serif;
+        transition: all 0.3s;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        text-decoration: none;
+        display: inline-block;
+        pointer-events: auto;
+      }
 
-.home-button:hover {
-    background: var(--teal);
-    transform: translateY(-3px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
-}
+      .home-button:hover {
+        background: var(--teal);
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+      }
 
-@media (max-width: 768px) {
-    .home-button {
-        top: 15px;
-        right: 15px;
-        padding: 10px 20px;
-        font-size: 1.1em;
-    }
-}
-</style>
-</head>
-<body>
-<div id="ui">
-  <a href="index.html" class="home-button">🏠 Home</a>
-  <div id="score-box">Score: <span id="score-val">0</span></div>
-  
-  <div id="title-box"><h1 class="title">David vs. Goliath</h1><small style="font-size:0.75rem;color:black;">Aim & tap to launch!</small></div>
- <div id="stones-box"><svg width="32" height="32" viewBox="0 0 100 100" style="vertical-align:middle;margin-right:6px"><ellipse cx="50" cy="78" rx="36" ry="10" fill="#7a6040" opacity="0.5"/><polygon points="15,68 10,45 22,28 38,15 58,12 75,22 88,40 85,62 70,72 35,74" fill="#c8a46a"/><polygon points="22,28 38,15 58,12 62,30 45,35 25,40" fill="#d4b47a"/><polygon points="58,12 75,22 88,40 78,38 65,28 62,30" fill="#b8944a"/><polygon points="85,62 70,72 68,55 78,38 88,40" fill="#a07838"/><polygon points="15,68 10,45 22,28 25,40 18,55" fill="#b89458"/><polygon points="38,22 50,18 55,28 42,32" fill="#e0c48a" opacity="0.7"/></svg><span id="stones-val">5</span></div>
-</div>
-<div id="msg"><span class="big" id="msg-title">Well done!</span><span id="msg-body"></span></div>
-<button id="restart" onclick="restartGame()">Play Again!</button>
-<div id="aim-hint" id="hint">Press & drag to aim, release to fire</div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script>
-// ── Scene setup ──────────────────────────────────────────────
-const W = window.innerWidth, H = window.innerHeight;
-const renderer = new THREE.WebGLRenderer({ antialias: true });
-renderer.setSize(W, H);
-renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-document.body.appendChild(renderer.domElement);
+      @media (max-width: 768px) {
+        .home-button {
+          top: 15px;
+          right: 15px;
+          padding: 10px 20px;
+          font-size: 1.1em;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="ui">
+      <a href="index.html" class="home-button">🏠 Home</a>
+      <div id="score-box">Score: <span id="score-val">0</span></div>
 
-const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x87CEEB); // midnight
-scene.fog = new THREE.Fog(0x87CEEB, 60, 120);
+      <div id="title-box">
+        <h1 class="title">David vs. Goliath</h1>
+        <small style="font-size: 0.75rem; color: black"
+          >Aim & tap to launch!</small
+        >
+      </div>
+      <div id="stones-box">
+        <svg
+          width="32"
+          height="32"
+          viewBox="0 0 100 100"
+          style="vertical-align: middle; margin-right: 6px"
+        >
+          <ellipse
+            cx="50"
+            cy="78"
+            rx="36"
+            ry="10"
+            fill="#7a6040"
+            opacity="0.5"
+          />
+          <polygon
+            points="15,68 10,45 22,28 38,15 58,12 75,22 88,40 85,62 70,72 35,74"
+            fill="#c8a46a"
+          />
+          <polygon
+            points="22,28 38,15 58,12 62,30 45,35 25,40"
+            fill="#d4b47a"
+          />
+          <polygon
+            points="58,12 75,22 88,40 78,38 65,28 62,30"
+            fill="#b8944a"
+          />
+          <polygon points="85,62 70,72 68,55 78,38 88,40" fill="#a07838" />
+          <polygon points="15,68 10,45 22,28 25,40 18,55" fill="#b89458" />
+          <polygon
+            points="38,22 50,18 55,28 42,32"
+            fill="#e0c48a"
+            opacity="0.7"
+          /></svg
+        ><span id="stones-val">5</span>
+      </div>
+    </div>
+    <div id="msg">
+      <span class="big" id="msg-title">Well done!</span
+      ><span id="msg-body"></span>
+    </div>
+    <button id="restart" onclick="restartGame()">Play Again!</button>
+    <div id="aim-hint" id="hint">Press & drag to aim, release to fire</div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+      // ── Scene setup ──────────────────────────────────────────────
+      const W = window.innerWidth,
+        H = window.innerHeight;
+      const renderer = new THREE.WebGLRenderer({ antialias: true });
+      renderer.setSize(W, H);
+      renderer.shadowMap.enabled = true;
+      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+      document.body.appendChild(renderer.domElement);
 
-const camera = new THREE.PerspectiveCamera(60, W/H, 0.1, 200);
-camera.position.set(0, 3, 14);
-camera.lookAt(0, 4, 0);
+      const scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x87ceeb); // midnight
+      scene.fog = new THREE.Fog(0x87ceeb, 60, 120);
 
-// Lighting
-const ambient = new THREE.AmbientLight(0xffeebb, 0.7);
-scene.add(ambient);
-const sun = new THREE.DirectionalLight(0xfff5cc, 1.2);
-sun.position.set(20, 40, 10);
-sun.castShadow = true;
-sun.shadow.mapSize.set(1024, 1024);
-sun.shadow.camera.near = 0.5;
-sun.shadow.camera.far = 100;
-sun.shadow.camera.left = -30;
-sun.shadow.camera.right = 30;
-sun.shadow.camera.top = 30;
-sun.shadow.camera.bottom = -30;
-scene.add(sun);
+      const camera = new THREE.PerspectiveCamera(60, W / H, 0.1, 200);
+      camera.position.set(0, 3, 14);
+      camera.lookAt(0, 4, 0);
 
-// ── Ground / Sky environment ─────────────────────────────────
-// Ground
-const gGeo = new THREE.PlaneGeometry(200, 200);
-const gMat = new THREE.MeshLambertMaterial({ color: 0xc8a46a });
-const ground = new THREE.Mesh(gGeo, gMat);
-ground.rotation.x = -Math.PI/2;
-ground.receiveShadow = true;
-scene.add(ground);
+      // Lighting
+      const ambient = new THREE.AmbientLight(0xffeebb, 0.7);
+      scene.add(ambient);
+      const sun = new THREE.DirectionalLight(0xfff5cc, 1.2);
+      sun.position.set(20, 40, 10);
+      sun.castShadow = true;
+      sun.shadow.mapSize.set(1024, 1024);
+      sun.shadow.camera.near = 0.5;
+      sun.shadow.camera.far = 100;
+      sun.shadow.camera.left = -30;
+      sun.shadow.camera.right = 30;
+      sun.shadow.camera.top = 30;
+      sun.shadow.camera.bottom = -30;
+      scene.add(sun);
 
-// Hills in background
-function makeHill(x, z, r, color) {
-  const g = new THREE.SphereGeometry(r, 16, 8, 0, Math.PI*2, 0, Math.PI/2);
-  const m = new THREE.MeshLambertMaterial({ color });
-  const h = new THREE.Mesh(g, m);
-  h.position.set(x, 0, z);
-  h.receiveShadow = true;
-  scene.add(h);
-}
-makeHill(-30, -25, 18, 0x8aab5a);
-makeHill(28, -30, 22, 0x7a9b4a);
-makeHill(0, -40, 25, 0x6a8b3a);
+      // ── Ground / Sky environment ─────────────────────────────────
+      // Ground
+      const gGeo = new THREE.PlaneGeometry(200, 200);
+      const gMat = new THREE.MeshLambertMaterial({ color: 0xc8a46a });
+      const ground = new THREE.Mesh(gGeo, gMat);
+      ground.rotation.x = -Math.PI / 2;
+      ground.receiveShadow = true;
+      scene.add(ground);
 
-// Decorative rocks/bushes
-function addRock(x, y, z, s) {
-  const g = new THREE.DodecahedronGeometry(s, 0);
-  const m = new THREE.MeshLambertMaterial({ color: 0x888880 });
-  const r = new THREE.Mesh(g, m);
-  r.position.set(x, y, z);
-  r.rotation.set(Math.random(), Math.random(), Math.random());
-  r.castShadow = true;
-  scene.add(r);
-}
-[-8,-5,4,9,-12,11].forEach((x,i) => addRock(x, 0.3, -2+i*0.5, 0.3+Math.random()*0.3));
+      // Hills in background
+      function makeHill(x, z, r, color) {
+        const g = new THREE.SphereGeometry(
+          r,
+          16,
+          8,
+          0,
+          Math.PI * 2,
+          0,
+          Math.PI / 2,
+        );
+        const m = new THREE.MeshLambertMaterial({ color });
+        const h = new THREE.Mesh(g, m);
+        h.position.set(x, 0, z);
+        h.receiveShadow = true;
+        scene.add(h);
+      }
+      makeHill(-30, -25, 18, 0x8aab5a);
+      makeHill(28, -30, 22, 0x7a9b4a);
+      makeHill(0, -40, 25, 0x6a8b3a);
 
+      // Decorative rocks/bushes
+      function addRock(x, y, z, s) {
+        const g = new THREE.DodecahedronGeometry(s, 0);
+        const m = new THREE.MeshLambertMaterial({ color: 0x888880 });
+        const r = new THREE.Mesh(g, m);
+        r.position.set(x, y, z);
+        r.rotation.set(Math.random(), Math.random(), Math.random());
+        r.castShadow = true;
+        scene.add(r);
+      }
+      [-8, -5, 4, 9, -12, 11].forEach((x, i) =>
+        addRock(x, 0.3, -2 + i * 0.5, 0.3 + Math.random() * 0.3),
+      );
 
-// ── Goliath (target dummy) ────────────────────────────────────
-const goliathGroup = new THREE.Group();
-scene.add(goliathGroup);
+      // ── Goliath (target dummy) ────────────────────────────────────
+      const goliathGroup = new THREE.Group();
+      scene.add(goliathGroup);
 
-function makeMesh(geo, color, castShadow=true) {
-  const m = new THREE.Mesh(geo, new THREE.MeshLambertMaterial({ color }));
-  if (castShadow) m.castShadow = true;
-  return m;
-}
+      function makeMesh(geo, color, castShadow = true) {
+        const m = new THREE.Mesh(geo, new THREE.MeshLambertMaterial({ color }));
+        if (castShadow) m.castShadow = true;
+        return m;
+      }
 
-// Body
-const body = makeMesh(new THREE.CylinderGeometry(0.9, 0.7, 2.4, 12), 0x8B4513);
-body.position.y = 2.2;
-goliathGroup.add(body);
-// Armor plate
-const armor = makeMesh(new THREE.BoxGeometry(1.6, 1.8, 0.3), 0x888888);
-armor.position.set(0, 2.2, 0.7);
-goliathGroup.add(armor);
-// Head
-const head = makeMesh(new THREE.SphereGeometry(0.65, 12, 10), 0xdaa07a);
-head.position.y = 4.1;
-goliathGroup.add(head);
-// Helmet
-const helmet = makeMesh(new THREE.CylinderGeometry(0.5, 0.68, 0.5, 12), 0x777777);
-helmet.position.y = 4.55;
-goliathGroup.add(helmet);
-const helmetTop = makeMesh(new THREE.SphereGeometry(0.5, 12, 8, 0, Math.PI*2, 0, Math.PI/2), 0x777777);
-helmetTop.position.y = 4.8;
-goliathGroup.add(helmetTop);
-// Eyes - red and angry
-[-0.22, 0.22].forEach(x => {
-  const white = makeMesh(new THREE.SphereGeometry(0.13, 8, 8), 0xdddddd);
-  white.position.set(x, 4.2, 0.58);
-  goliathGroup.add(white);
-  const pupil = makeMesh(new THREE.SphereGeometry(0.07, 8, 8), 0xcc0000);
-  pupil.position.set(x, 4.2, 0.68);
-  goliathGroup.add(pupil);
-});
-// Heavy angry eyebrows
-[-0.22, 0.22].forEach((x,i) => {
-  const brow = makeMesh(new THREE.BoxGeometry(0.32, 0.11, 0.1), 0x1a1008);
-  brow.position.set(x, 4.42, 0.6);
-  brow.rotation.z = i===0 ? 0.55 : -0.55;
-  goliathGroup.add(brow);
-});
-// Scowling mouth
-const mouth = makeMesh(new THREE.BoxGeometry(0.4, 0.1, 0.08), 0x3a1010);
-mouth.position.set(0, 3.88, 0.6);
-mouth.rotation.z = 0.15;
-goliathGroup.add(mouth);
-// Scar across face
-const scar = makeMesh(new THREE.BoxGeometry(0.06, 0.45, 0.06), 0x8a4030);
-scar.position.set(0.18, 4.1, 0.62);
-scar.rotation.z = 0.3;
-goliathGroup.add(scar);
-// Bigger spiked shoulder pads
-[-1.1, 1.1].forEach(x => {
-  const pad = makeMesh(new THREE.CylinderGeometry(0.5, 0.4, 0.3, 8), 0x666666);
-  pad.position.set(x, 3.3, 0);
-  goliathGroup.add(pad);
-  // Spikes on shoulder
-  for (let s = 0; s < 3; s++) {
-    const spike = makeMesh(new THREE.ConeGeometry(0.1, 0.4, 6), 0x444444);
-    spike.position.set(x + (x<0?-0.2:0.2)*s*0.3, 3.55 + s*0.05, s*0.15-0.1);
-    spike.rotation.z = x < 0 ? -0.5 - s*0.2 : 0.5 + s*0.2;
-    goliathGroup.add(spike);
-  }
-});
-// Arms
-[-1.1, 1.1].forEach((x,i) => {
-  const arm = makeMesh(new THREE.CylinderGeometry(0.25, 0.2, 1.8, 8), 0x8B4513);
-  arm.position.set(x, 2.4, 0);
-  arm.rotation.z = x < 0 ? 0.4 : -0.4;
-  goliathGroup.add(arm);
-});
-// Legs
-[-0.4, 0.4].forEach(x => {
-  const leg = makeMesh(new THREE.CylinderGeometry(0.28, 0.22, 1.8, 8), 0x6B3410);
-  leg.position.set(x, 0.9, 0);
-  goliathGroup.add(leg);
-});
-// Shield
-const shield = makeMesh(new THREE.CylinderGeometry(0.7, 0.7, 0.15, 20), 0x996633);
-shield.rotation.z = Math.PI/2;
-shield.position.set(-1.6, 2.5, 0.2);
-goliathGroup.add(shield);
-// Spear
-const spearHandle = makeMesh(new THREE.CylinderGeometry(0.07, 0.07, 4, 8), 0x8B6914);
-spearHandle.position.set(1.4, 3.0, 0);
-goliathGroup.add(spearHandle);
-const spearTip = makeMesh(new THREE.ConeGeometry(0.2, 0.6, 8), 0x999999);
-spearTip.position.set(1.4, 5.2, 0);
-goliathGroup.add(spearTip);
+      // Body
+      const body = makeMesh(
+        new THREE.CylinderGeometry(0.9, 0.7, 2.4, 12),
+        0x8b4513,
+      );
+      body.position.y = 2.2;
+      goliathGroup.add(body);
+      // Armor plate
+      const armor = makeMesh(new THREE.BoxGeometry(1.6, 1.8, 0.3), 0x888888);
+      armor.position.set(0, 2.2, 0.7);
+      goliathGroup.add(armor);
+      // Head
+      const head = makeMesh(new THREE.SphereGeometry(0.65, 12, 10), 0xdaa07a);
+      head.position.y = 4.1;
+      goliathGroup.add(head);
+      // Helmet
+      const helmet = makeMesh(
+        new THREE.CylinderGeometry(0.5, 0.68, 0.5, 12),
+        0x777777,
+      );
+      helmet.position.y = 4.55;
+      goliathGroup.add(helmet);
+      const helmetTop = makeMesh(
+        new THREE.SphereGeometry(0.5, 12, 8, 0, Math.PI * 2, 0, Math.PI / 2),
+        0x777777,
+      );
+      helmetTop.position.y = 4.8;
+      goliathGroup.add(helmetTop);
+      // Eyes - red and angry
+      [-0.22, 0.22].forEach((x) => {
+        const white = makeMesh(new THREE.SphereGeometry(0.13, 8, 8), 0xdddddd);
+        white.position.set(x, 4.2, 0.58);
+        goliathGroup.add(white);
+        const pupil = makeMesh(new THREE.SphereGeometry(0.07, 8, 8), 0xcc0000);
+        pupil.position.set(x, 4.2, 0.68);
+        goliathGroup.add(pupil);
+      });
+      // Heavy angry eyebrows
+      [-0.22, 0.22].forEach((x, i) => {
+        const brow = makeMesh(new THREE.BoxGeometry(0.32, 0.11, 0.1), 0x1a1008);
+        brow.position.set(x, 4.42, 0.6);
+        brow.rotation.z = i === 0 ? 0.55 : -0.55;
+        goliathGroup.add(brow);
+      });
+      // Scowling mouth
+      const mouth = makeMesh(new THREE.BoxGeometry(0.4, 0.1, 0.08), 0x3a1010);
+      mouth.position.set(0, 3.88, 0.6);
+      mouth.rotation.z = 0.15;
+      goliathGroup.add(mouth);
+      // Scar across face
+      const scar = makeMesh(new THREE.BoxGeometry(0.06, 0.45, 0.06), 0x8a4030);
+      scar.position.set(0.18, 4.1, 0.62);
+      scar.rotation.z = 0.3;
+      goliathGroup.add(scar);
+      // Bigger spiked shoulder pads
+      [-1.1, 1.1].forEach((x) => {
+        const pad = makeMesh(
+          new THREE.CylinderGeometry(0.5, 0.4, 0.3, 8),
+          0x666666,
+        );
+        pad.position.set(x, 3.3, 0);
+        goliathGroup.add(pad);
+        // Spikes on shoulder
+        for (let s = 0; s < 3; s++) {
+          const spike = makeMesh(new THREE.ConeGeometry(0.1, 0.4, 6), 0x444444);
+          spike.position.set(
+            x + (x < 0 ? -0.2 : 0.2) * s * 0.3,
+            3.55 + s * 0.05,
+            s * 0.15 - 0.1,
+          );
+          spike.rotation.z = x < 0 ? -0.5 - s * 0.2 : 0.5 + s * 0.2;
+          goliathGroup.add(spike);
+        }
+      });
+      // Arms
+      [-1.1, 1.1].forEach((x, i) => {
+        const arm = makeMesh(
+          new THREE.CylinderGeometry(0.25, 0.2, 1.8, 8),
+          0x8b4513,
+        );
+        arm.position.set(x, 2.4, 0);
+        arm.rotation.z = x < 0 ? 0.4 : -0.4;
+        goliathGroup.add(arm);
+      });
+      // Legs
+      [-0.4, 0.4].forEach((x) => {
+        const leg = makeMesh(
+          new THREE.CylinderGeometry(0.28, 0.22, 1.8, 8),
+          0x6b3410,
+        );
+        leg.position.set(x, 0.9, 0);
+        goliathGroup.add(leg);
+      });
+      // Shield
+      const shield = makeMesh(
+        new THREE.CylinderGeometry(0.7, 0.7, 0.15, 20),
+        0x996633,
+      );
+      shield.rotation.z = Math.PI / 2;
+      shield.position.set(-1.6, 2.5, 0.2);
+      goliathGroup.add(shield);
+      // Spear
+      const spearHandle = makeMesh(
+        new THREE.CylinderGeometry(0.07, 0.07, 4, 8),
+        0x8b6914,
+      );
+      spearHandle.position.set(1.4, 3.0, 0);
+      goliathGroup.add(spearHandle);
+      const spearTip = makeMesh(new THREE.ConeGeometry(0.2, 0.6, 8), 0x999999);
+      spearTip.position.set(1.4, 5.2, 0);
+      goliathGroup.add(spearTip);
 
-goliathGroup.position.set(0, 0, -10);
-goliathGroup.scale.setScalar(1.7);
+      goliathGroup.position.set(0, 0, -10);
+      goliathGroup.scale.setScalar(1.7);
 
+      // ── Stars (hit effect) ─────────────────────────────────────────
+      const stars = [];
+      function spawnStars(pos) {
+        for (let i = 0; i < 12; i++) {
+          const g = new THREE.SphereGeometry(0.15, 6, 6);
+          const m = new THREE.MeshBasicMaterial({
+            color: new THREE.Color().setHSL(Math.random(), 1, 0.6),
+          });
+          const s = new THREE.Mesh(g, m);
+          s.position.copy(pos);
+          const v = new THREE.Vector3(
+            (Math.random() - 0.5) * 8,
+            Math.random() * 6 + 2,
+            (Math.random() - 0.5) * 4,
+          );
+          scene.add(s);
+          stars.push({ mesh: s, vel: v, life: 1.0 });
+        }
+      }
 
+      // ── Sling / David indicator ───────────────────────────────────
+      const slingGroup = new THREE.Group();
+      scene.add(slingGroup);
+      // Simple sling handle at bottom center
+      const slingBase = makeMesh(
+        new THREE.CylinderGeometry(0.15, 0.15, 0.6, 8),
+        0x8b6914,
+      );
+      slingBase.position.set(0, 0.3, 12);
+      slingGroup.add(slingBase);
 
-// ── Stars (hit effect) ─────────────────────────────────────────
-const stars = [];
-function spawnStars(pos) {
-  for (let i = 0; i < 12; i++) {
-    const g = new THREE.SphereGeometry(0.15, 6, 6);
-    const m = new THREE.MeshBasicMaterial({ color: new THREE.Color().setHSL(Math.random(), 1, 0.6) });
-    const s = new THREE.Mesh(g, m);
-    s.position.copy(pos);
-    const v = new THREE.Vector3((Math.random()-0.5)*8, Math.random()*6+2, (Math.random()-0.5)*4);
-    scene.add(s);
-    stars.push({ mesh: s, vel: v, life: 1.0 });
-  }
-}
+      // ── Aim arrow ─────────────────────────────────────────────────
+      const arrowGeo = new THREE.ConeGeometry(0.18, 0.7, 8);
+      const arrowMat = new THREE.MeshBasicMaterial({
+        color: 0x2ec4b6,
+        transparent: true,
+        opacity: 0.85,
+      });
+      const arrow = new THREE.Mesh(arrowGeo, arrowMat);
+      arrow.visible = false;
+      scene.add(arrow);
 
-// ── Sling / David indicator ───────────────────────────────────
-const slingGroup = new THREE.Group();
-scene.add(slingGroup);
-// Simple sling handle at bottom center
-const slingBase = makeMesh(new THREE.CylinderGeometry(0.15, 0.15, 0.6, 8), 0x8B6914);
-slingBase.position.set(0, 0.3, 12);
-slingGroup.add(slingBase);
-
-// ── Aim arrow ─────────────────────────────────────────────────
-const arrowGeo = new THREE.ConeGeometry(0.18, 0.7, 8);
-const arrowMat = new THREE.MeshBasicMaterial({ color: 0x2ec4b6, transparent: true, opacity: 0.85 });
-const arrow = new THREE.Mesh(arrowGeo, arrowMat);
-arrow.visible = false;
-scene.add(arrow);
-
-// ── Stone (projectile) ────────────────────────────────────────
-const stoneGeo = new THREE.DodecahedronGeometry(0.28, 0);
-const stoneMat = new THREE.MeshLambertMaterial({ color: 0xaaaaaa });
-const stone = new THREE.Mesh(stoneGeo, stoneMat);
-stone.castShadow = true;
-stone.visible = false;
-scene.add(stone);
-
-// ── Trajectory dots ───────────────────────────────────────────
-const dotPool = [];
-for (let i = 0; i < 10; i++) {
-  const d = new THREE.Mesh(
-    new THREE.SphereGeometry(0.1, 6, 6),
-    new THREE.MeshBasicMaterial({ color: 0x2ec4b6, transparent: true, opacity: 0.5 })
-  );
-  d.visible = false;
-  scene.add(d);
-  dotPool.push(d);
-}
-
-// ── Audio ─────────────────────────────────────────────────────
-const hitSound = new Audio('hit_ouch.wav');
-
-// ── Game state ────────────────────────────────────────────────
-let score = 0, stonesLeft = 5;
-let stoneInFlight = false;
-let stonePos, stoneVel;
-let goliathHit = false, goliathFallAngle = 0;
-let isDragging = false, dragStart = null, dragCurrent = null;
-let gameOver = false;
-
-const scoreEl = document.getElementById('score-val');
-const stonesEl = document.getElementById('stones-val');
-const msgEl = document.getElementById('msg');
-const msgTitle = document.getElementById('msg-title');
-const msgBody = document.getElementById('msg-body');
-const restartBtn = document.getElementById('restart');
-const hintEl = document.getElementById('aim-hint');
-
-function updateUI() {
-  scoreEl.textContent = score;
-  stonesEl.textContent = stonesLeft;
-}
-
-// Convert pointer event to normalized coords
-function getPointer(e) {
-  const t = e.touches ? e.touches[0] : e;
-  return { x: t.clientX / W, y: t.clientY / H };
-}
-
-// Compute launch velocity from drag
-function computeVelocity(start, current) {
-  const dx = (current.x - start.x) * 28;
-  const dy = -(current.y - start.y) * 28;
-  // horizontal aim maps to x, vertical drag maps to y/z
-  const vx = dx;
-  const vy = Math.max(4, dy + 6);
-  const vz = -18 - Math.abs(dy) * 0.5;
-  return new THREE.Vector3(vx, vy, vz);
-}
-
-function launchStone(vel) {
-  if (stoneInFlight || stonesLeft <= 0 || gameOver) return;
-  stonesLeft--;
-  updateUI();
-  stonePos = new THREE.Vector3(0, 1.5, 12);
-  stoneVel = vel.clone();
-  stone.position.copy(stonePos);
-  stone.visible = true;
-  stoneInFlight = true;
-  hintEl.style.display = 'none';
-  dotPool.forEach(d => d.visible = false);
-  arrow.visible = false;
-}
-
-function showTrajectory(start, cur) {
-  const vel = computeVelocity(start, cur);
-  let p = new THREE.Vector3(0, 1.5, 12);
-  const g = new THREE.Vector3(0, -12, 0);
-  const dt = 0.08;
-  let v = vel.clone();
-  dotPool.forEach((d, i) => {
-    for (let s = 0; s < 3; s++) {
-      v.addScaledVector(g, dt);
-      p = p.clone().addScaledVector(v, dt);
-    }
-    d.position.copy(p);
-    d.visible = p.y > 0 && p.z > -20;
-  });
-  // Arrow direction
-  arrow.visible = true;
-  arrow.position.set(0, 2.5, 12);
-  const dir = vel.clone().normalize();
-  arrow.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0), dir);
-}
-
-// Pointer handlers
-function onDown(e) {
-  if (stoneInFlight || gameOver) return;
-  isDragging = true;
-  dragStart = getPointer(e);
-  dragCurrent = { ...dragStart };
-  e.preventDefault();
-}
-function onMove(e) {
-  if (!isDragging) return;
-  dragCurrent = getPointer(e);
-  showTrajectory(dragStart, dragCurrent);
-  e.preventDefault();
-}
-function onUp(e) {
-  if (!isDragging) return;
-  isDragging = false;
-  dotPool.forEach(d => d.visible = false);
-  arrow.visible = false;
-  if (dragStart && dragCurrent) {
-    const dist = Math.hypot(dragCurrent.x - dragStart.x, dragCurrent.y - dragStart.y);
-    if (dist > 0.01) launchStone(computeVelocity(dragStart, dragCurrent));
-  }
-  dragStart = dragCurrent = null;
-}
-
-renderer.domElement.addEventListener('mousedown', onDown);
-renderer.domElement.addEventListener('mousemove', onMove);
-renderer.domElement.addEventListener('mouseup', onUp);
-renderer.domElement.addEventListener('touchstart', onDown, { passive: false });
-renderer.domElement.addEventListener('touchmove', onMove, { passive: false });
-renderer.domElement.addEventListener('touchend', onUp, { passive: false });
-
-// ── Collision check ───────────────────────────────────────────
-function checkHit() {
-  const gp = goliathGroup.position;
-  const dx = Math.abs(stone.position.x - gp.x);
-  const dy = stone.position.y - gp.y;
-  const dz = Math.abs(stone.position.z - gp.z);
-  return dx < 1.4 && dy > 0.5 && dy < 5.5 && dz < 1.5;
-}
-
-function onHit() {
-  score += 100;
-  updateUI();
-  goliathHit = true;
-  hitSound.currentTime = 0;
-  hitSound.play();
-  stoneInFlight = false;
-  stone.visible = false;
-  spawnStars(stone.position.clone());
-  // Reset stone after delay
-  setTimeout(() => {
-    if (!gameOver) resetGoliath();
-  }, 1800);
-}
-
-function resetGoliath() {
-  goliathHit = false;
-  goliathFallAngle = 0;
-  goliathGroup.rotation.z = 0;
-  goliathGroup.position.x = (Math.random()-0.5)*6;
-  goliathGroup.position.z = -10 - Math.random()*4;
-}
-
-function checkGameOver() {
-  if (stonesLeft <= 0 && !stoneInFlight && !goliathHit) {
-    gameOver = true;
-    let msg = '';
-    if (score === 0) msg = 'Keep practicing, David!';
-    else if (score < 300) msg = 'Good effort, brave warrior!';
-    else if (score < 600) msg = 'Great aim, David!';
-    else msg = 'You defeated Goliath! 🎉';
-    msgTitle.textContent = score >= 300 ? '⭐ Great Job! ⭐' : '🪨 Game Over!';
-    msgBody.textContent = `Final Score: ${score}  |  ${msg}`;
-    msgEl.style.display = 'block';
-    restartBtn.style.display = 'block';
-  }
-}
-
-function restartGame() {
-  score = 0; stonesLeft = 5;
-  gameOver = false; stoneInFlight = false;
-  goliathHit = false; goliathFallAngle = 0;
-  goliathGroup.rotation.z = 0;
-  goliathGroup.position.set(0, 0, -10);
-  stone.visible = false;
-  stars.forEach(s => scene.remove(s.mesh));
-  stars.length = 0;
-  msgEl.style.display = 'none';
-  restartBtn.style.display = 'none';
-  hintEl.style.display = 'block';
-  updateUI();
-}
-
-// Goliath side-to-side bob
-let bobT = 0;
-
-// ── Clouds ────────────────────────────────────────────────────
-const clouds = [];
-for (let i = 0; i < 6; i++) {
-  const cg = new THREE.Group();
-  [0, 0.6, -0.5].forEach((ox, ci) => {
-    const s = 1.2 + ci * 0.4;
-    const sphere = new THREE.Mesh(
-      new THREE.SphereGeometry(s, 10, 8),
-      new THREE.MeshLambertMaterial({ color: 0xffffff })
-    );
-    sphere.position.set(ox * 2, ci * 0.3, 0);
-    cg.add(sphere);
-  });
-  cg.position.set((Math.random()-0.5)*80, 18+Math.random()*8, -30-Math.random()*20);
-  scene.add(cg);
-  clouds.push({ group: cg, speed: 0.02 + Math.random()*0.02 });
-}
-
-// ── Animation loop ────────────────────────────────────────────
-const clock = new THREE.Clock();
-
-function animate() {
-  requestAnimationFrame(animate);
-  const dt = clock.getDelta();
-
-  // Clouds drift
-  clouds.forEach(c => {
-    c.group.position.x += c.speed;
-    if (c.group.position.x > 60) c.group.position.x = -60;
-  });
-
-  // Goliath bob
-  if (!goliathHit) {
-    bobT += dt;
-    goliathGroup.position.x += Math.sin(bobT * 1.2) * 0.015;
-    goliathGroup.rotation.y = Math.sin(bobT * 0.7) * 0.15;
-  }
-
-  // Goliath fall on hit
-  if (goliathHit && goliathFallAngle < Math.PI/2) {
-    goliathFallAngle += dt * 2.5;
-    goliathGroup.rotation.z = goliathFallAngle;
-    goliathGroup.position.y = -Math.sin(goliathFallAngle) * 0.5;
-  }
-
-
-  // Stone flight
-  if (stoneInFlight) {
-    stoneVel.y -= 18 * dt;
-    stonePos.addScaledVector(stoneVel, dt);
-    stone.position.copy(stonePos);
-    stone.rotation.x += dt * 8;
-    stone.rotation.y += dt * 5;
-
-    if (checkHit()) {
-      onHit();
-    } else if (stonePos.y < 0 || stonePos.z < -30 || Math.abs(stonePos.x) > 20) {
-      stoneInFlight = false;
+      // ── Stone (projectile) ────────────────────────────────────────
+      const stoneGeo = new THREE.DodecahedronGeometry(0.28, 0);
+      const stoneMat = new THREE.MeshLambertMaterial({ color: 0xaaaaaa });
+      const stone = new THREE.Mesh(stoneGeo, stoneMat);
+      stone.castShadow = true;
       stone.visible = false;
-      setTimeout(() => { if (!gameOver) checkGameOver(); }, 300);
-    }
-  } else if (!goliathHit && !gameOver && stonesLeft === 0) {
-    checkGameOver();
-  }
+      scene.add(stone);
 
-  // Stars
-  for (let i = stars.length - 1; i >= 0; i--) {
-    const s = stars[i];
-    s.vel.y -= 12 * dt;
-    s.mesh.position.addScaledVector(s.vel, dt);
-    s.life -= dt * 1.2;
-    s.mesh.material.opacity = Math.max(0, s.life);
-    s.mesh.material.transparent = true;
-    if (s.life <= 0) { scene.remove(s.mesh); stars.splice(i, 1); }
-  }
+      // ── Trajectory dots ───────────────────────────────────────────
+      const dotPool = [];
+      for (let i = 0; i < 10; i++) {
+        const d = new THREE.Mesh(
+          new THREE.SphereGeometry(0.1, 6, 6),
+          new THREE.MeshBasicMaterial({
+            color: 0x2ec4b6,
+            transparent: true,
+            opacity: 0.5,
+          }),
+        );
+        d.visible = false;
+        scene.add(d);
+        dotPool.push(d);
+      }
 
-  renderer.render(scene, camera);
-}
-animate();
-updateUI();
-</script>
-</body>
+      // ── Audio ─────────────────────────────────────────────────────
+      const hitSound = new Audio("hit_ouch.wav");
+
+      // ── Game state ────────────────────────────────────────────────
+      let score = 0,
+        stonesLeft = 5;
+      let stoneInFlight = false;
+      let stonePos, stoneVel;
+      let goliathHit = false,
+        goliathFallAngle = 0;
+      let isDragging = false,
+        dragStart = null,
+        dragCurrent = null;
+      let gameOver = false;
+
+      const scoreEl = document.getElementById("score-val");
+      const stonesEl = document.getElementById("stones-val");
+      const msgEl = document.getElementById("msg");
+      const msgTitle = document.getElementById("msg-title");
+      const msgBody = document.getElementById("msg-body");
+      const restartBtn = document.getElementById("restart");
+      const hintEl = document.getElementById("aim-hint");
+
+      function updateUI() {
+        scoreEl.textContent = score;
+        stonesEl.textContent = stonesLeft;
+      }
+
+      // Convert pointer event to normalized coords
+      function getPointer(e) {
+        const t = e.touches ? e.touches[0] : e;
+        return { x: t.clientX / W, y: t.clientY / H };
+      }
+
+      // Compute launch velocity from drag
+      function computeVelocity(start, current) {
+        const dx = (current.x - start.x) * 28;
+        const dy = -(current.y - start.y) * 28;
+        // horizontal aim maps to x, vertical drag maps to y/z
+        const vx = dx;
+        const vy = Math.max(4, dy + 6);
+        const vz = -18 - Math.abs(dy) * 0.5;
+        return new THREE.Vector3(vx, vy, vz);
+      }
+
+      function launchStone(vel) {
+        if (stoneInFlight || stonesLeft <= 0 || gameOver) return;
+        stonesLeft--;
+        updateUI();
+        stonePos = new THREE.Vector3(0, 1.5, 12);
+        stoneVel = vel.clone();
+        stone.position.copy(stonePos);
+        stone.visible = true;
+        stoneInFlight = true;
+        hintEl.style.display = "none";
+        dotPool.forEach((d) => (d.visible = false));
+        arrow.visible = false;
+      }
+
+      function showTrajectory(start, cur) {
+        const vel = computeVelocity(start, cur);
+        let p = new THREE.Vector3(0, 1.5, 12);
+        const g = new THREE.Vector3(0, -12, 0);
+        const dt = 0.08;
+        let v = vel.clone();
+        dotPool.forEach((d, i) => {
+          for (let s = 0; s < 3; s++) {
+            v.addScaledVector(g, dt);
+            p = p.clone().addScaledVector(v, dt);
+          }
+          d.position.copy(p);
+          d.visible = p.y > 0 && p.z > -20;
+        });
+        // Arrow direction
+        arrow.visible = true;
+        arrow.position.set(0, 2.5, 12);
+        const dir = vel.clone().normalize();
+        arrow.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir);
+      }
+
+      // Pointer handlers
+      function onDown(e) {
+        if (stoneInFlight || gameOver) return;
+        isDragging = true;
+        dragStart = getPointer(e);
+        dragCurrent = { ...dragStart };
+        e.preventDefault();
+      }
+      function onMove(e) {
+        if (!isDragging) return;
+        dragCurrent = getPointer(e);
+        showTrajectory(dragStart, dragCurrent);
+        e.preventDefault();
+      }
+      function onUp(e) {
+        if (!isDragging) return;
+        isDragging = false;
+        dotPool.forEach((d) => (d.visible = false));
+        arrow.visible = false;
+        if (dragStart && dragCurrent) {
+          const dist = Math.hypot(
+            dragCurrent.x - dragStart.x,
+            dragCurrent.y - dragStart.y,
+          );
+          if (dist > 0.01) launchStone(computeVelocity(dragStart, dragCurrent));
+        }
+        dragStart = dragCurrent = null;
+      }
+
+      renderer.domElement.addEventListener("mousedown", onDown);
+      renderer.domElement.addEventListener("mousemove", onMove);
+      renderer.domElement.addEventListener("mouseup", onUp);
+      renderer.domElement.addEventListener("touchstart", onDown, {
+        passive: false,
+      });
+      renderer.domElement.addEventListener("touchmove", onMove, {
+        passive: false,
+      });
+      renderer.domElement.addEventListener("touchend", onUp, {
+        passive: false,
+      });
+
+      // ── Collision check ───────────────────────────────────────────
+      function checkHit() {
+        const gp = goliathGroup.position;
+        const dx = Math.abs(stone.position.x - gp.x);
+        const dy = stone.position.y - gp.y;
+        const dz = Math.abs(stone.position.z - gp.z);
+        return dx < 1.4 && dy > 0.5 && dy < 5.5 && dz < 1.5;
+      }
+
+      function onHit() {
+        score += 100;
+        updateUI();
+        goliathHit = true;
+        hitSound.currentTime = 0;
+        hitSound.play();
+        stoneInFlight = false;
+        stone.visible = false;
+        spawnStars(stone.position.clone());
+        // Reset stone after delay
+        setTimeout(() => {
+          if (!gameOver) resetGoliath();
+        }, 1800);
+      }
+
+      function resetGoliath() {
+        goliathHit = false;
+        goliathFallAngle = 0;
+        goliathGroup.rotation.z = 0;
+        goliathGroup.position.x = (Math.random() - 0.5) * 6;
+        goliathGroup.position.z = -10 - Math.random() * 4;
+      }
+
+      function checkGameOver() {
+        if (stonesLeft <= 0 && !stoneInFlight && !goliathHit) {
+          gameOver = true;
+          let msg = "";
+          if (score === 0) msg = "Keep practicing, David!";
+          else if (score < 300) msg = "Good effort, brave warrior!";
+          else if (score < 600) msg = "Great aim, David!";
+          else msg = "You defeated Goliath! 🎉";
+          msgTitle.textContent =
+            score >= 300 ? "⭐ Great Job! ⭐" : "🪨 Game Over!";
+          msgBody.textContent = `Final Score: ${score}  |  ${msg}`;
+          msgEl.style.display = "block";
+          restartBtn.style.display = "block";
+        }
+      }
+
+      function restartGame() {
+        score = 0;
+        stonesLeft = 5;
+        gameOver = false;
+        stoneInFlight = false;
+        goliathHit = false;
+        goliathFallAngle = 0;
+        goliathGroup.rotation.z = 0;
+        goliathGroup.position.set(0, 0, -10);
+        stone.visible = false;
+        stars.forEach((s) => scene.remove(s.mesh));
+        stars.length = 0;
+        msgEl.style.display = "none";
+        restartBtn.style.display = "none";
+        hintEl.style.display = "block";
+        updateUI();
+      }
+
+      // Goliath side-to-side bob
+      let bobT = 0;
+
+      // ── Clouds ────────────────────────────────────────────────────
+      const clouds = [];
+      for (let i = 0; i < 6; i++) {
+        const cg = new THREE.Group();
+        [0, 0.6, -0.5].forEach((ox, ci) => {
+          const s = 1.2 + ci * 0.4;
+          const sphere = new THREE.Mesh(
+            new THREE.SphereGeometry(s, 10, 8),
+            new THREE.MeshLambertMaterial({ color: 0xffffff }),
+          );
+          sphere.position.set(ox * 2, ci * 0.3, 0);
+          cg.add(sphere);
+        });
+        cg.position.set(
+          (Math.random() - 0.5) * 80,
+          18 + Math.random() * 8,
+          -30 - Math.random() * 20,
+        );
+        scene.add(cg);
+        clouds.push({ group: cg, speed: 0.02 + Math.random() * 0.02 });
+      }
+
+      // ── Animation loop ────────────────────────────────────────────
+      const clock = new THREE.Clock();
+
+      function animate() {
+        requestAnimationFrame(animate);
+        const dt = clock.getDelta();
+
+        // Clouds drift
+        clouds.forEach((c) => {
+          c.group.position.x += c.speed;
+          if (c.group.position.x > 60) c.group.position.x = -60;
+        });
+
+        // Goliath bob
+        if (!goliathHit) {
+          bobT += dt;
+          goliathGroup.position.x += Math.sin(bobT * 1.2) * 0.015;
+          goliathGroup.rotation.y = Math.sin(bobT * 0.7) * 0.15;
+        }
+
+        // Goliath fall on hit
+        if (goliathHit && goliathFallAngle < Math.PI / 2) {
+          goliathFallAngle += dt * 2.5;
+          goliathGroup.rotation.z = goliathFallAngle;
+          goliathGroup.position.y = -Math.sin(goliathFallAngle) * 0.5;
+        }
+
+        // Stone flight
+        if (stoneInFlight) {
+          stoneVel.y -= 18 * dt;
+          stonePos.addScaledVector(stoneVel, dt);
+          stone.position.copy(stonePos);
+          stone.rotation.x += dt * 8;
+          stone.rotation.y += dt * 5;
+
+          if (checkHit()) {
+            onHit();
+          } else if (
+            stonePos.y < 0 ||
+            stonePos.z < -30 ||
+            Math.abs(stonePos.x) > 20
+          ) {
+            stoneInFlight = false;
+            stone.visible = false;
+            setTimeout(() => {
+              if (!gameOver) checkGameOver();
+            }, 300);
+          }
+        } else if (!goliathHit && !gameOver && stonesLeft === 0) {
+          checkGameOver();
+        }
+
+        // Stars
+        for (let i = stars.length - 1; i >= 0; i--) {
+          const s = stars[i];
+          s.vel.y -= 12 * dt;
+          s.mesh.position.addScaledVector(s.vel, dt);
+          s.life -= dt * 1.2;
+          s.mesh.material.opacity = Math.max(0, s.life);
+          s.mesh.material.transparent = true;
+          if (s.life <= 0) {
+            scene.remove(s.mesh);
+            stars.splice(i, 1);
+          }
+        }
+
+        renderer.render(scene, camera);
+      }
+      animate();
+      updateUI();
+    </script>
+  </body>
 </html>
