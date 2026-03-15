@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bible Story Game - The World Says vs. Jesus Says</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Bubblegum+Sans&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --midnight: #011627;
+            --white: #fdfffc;
+            --teal: #2ec4b6;
+            --red: #e71d36;
+            --orange: #ff9f1c;
+            --green: #22c55e;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            font-family: 'Fredoka', sans-serif;
+            background: var(--midnight);
+            min-height: 100vh;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            padding: 20px;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image:
+                radial-gradient(circle at 20% 30%, rgba(46,196,182,0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(255,159,28,0.1) 0%, transparent 50%),
+                radial-gradient(circle at 50% 50%, rgba(231,29,54,0.05) 0%, transparent 50%);
+            animation: bgMove 20s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        @keyframes bgMove {
+            0%,100% { transform: scale(1) rotate(0deg); }
+            50% { transform: scale(1.1) rotate(5deg); }
+        }
+
+        .container {
+            background: var(--white);
+            border-radius: 40px;
+            padding: 50px 40px;
+            max-width: 1100px;
+            width: 100%;
+            box-shadow: 0 30px 80px rgba(0,0,0,0.5);
+            position: relative;
+            z-index: 1;
+            margin-top: 20px;
+        }
+
+        .home-button {
+            position: absolute;
+            top: 30px; right: 30px;
+            background: var(--orange);
+            color: var(--white);
+            padding: 15px 30px;
+            border: none; border-radius: 15px;
+            font-size: 1.3em; font-weight: 700;
+            cursor: pointer;
+            font-family: 'Fredoka', sans-serif;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            text-decoration: none; display: inline-block;
+        }
+        .home-button:hover { background: var(--teal); transform: translateY(-3px); }
+
+        .header { text-align: center; margin-bottom: 30px; }
+        .title { font-family: 'Bubblegum Sans', cursive; font-size: 3em; color: var(--teal); margin-bottom: 8px; }
+        .subtitle { font-size: 1.4em; color: var(--midnight); font-weight: 600; opacity: 0.7; }
+
+        /* Side Labels */
+        .side-labels {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 16px; padding: 0 10px;
+        }
+        .side-label {
+            font-family: 'Bubblegum Sans', cursive;
+            font-size: 1.8em; padding: 12px 28px; border-radius: 50px;
+        }
+        .label-world { background: var(--red); color: var(--white); }
+        .label-jesus { background: var(--teal); color: var(--white); }
+
+        /* Play area */
+        .play-area { display: flex; flex-direction: column; align-items: center; gap: 28px; }
+
+        /* Deck */
+        .deck-wrapper { position: relative; width: 600px; height: 400px; cursor: pointer; }
+        .deck-shadow { position: absolute; width: 600px; height: 400px; border-radius: 20px; background: var(--midnight); top: 8px; left: 8px; }
+        .deck-back {
+            position: absolute; width: 600px; height: 400px;
+            border-radius: 20px;
+            background: linear-gradient(135deg, var(--teal), var(--midnight));
+            border: 4px solid rgba(255,255,255,0.15);
+            display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+        .deck-back:hover { transform: translateY(-4px); box-shadow: 0 14px 35px rgba(0,0,0,0.4); }
+        .deck-back .deck-icon { font-size: 4em; }
+        .deck-back .deck-label { font-family: 'Bubblegum Sans', cursive; font-size: 1.5em; color: var(--white); text-align: center; padding: 0 20px; }
+        .deck-count { font-size: 1.1em; font-weight: 600; color: rgba(255,255,255,0.7); }
+
+        /* Card flip */
+        .card-scene { width: 600px; height: 400px; display: none; }
+        .card-scene.visible { display: block; }
+        .card-flip {
+            width: 100%; height: 100%;
+            position: relative; transform-style: preserve-3d;
+            transition: transform 0.6s cubic-bezier(0.4,0,0.2,1);
+        }
+        .card-flip.flipped { transform: rotateY(180deg); }
+        .card-face {
+            position: absolute; width: 100%; height: 100%;
+            backface-visibility: hidden; -webkit-backface-visibility: hidden;
+            border-radius: 20px; overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        .card-front { transform: rotateY(180deg); background: var(--white); display: flex; flex-direction: column; }
+        .card-back-face {
+            background: linear-gradient(135deg, var(--teal), var(--midnight));
+            display: flex; align-items: center; justify-content: center; font-size: 4em;
+        }
+        .card-img-wrapper { flex: 1; overflow: hidden; display: flex; align-items: center; justify-content: center; background: #f0f0f0; }
+        .card-img-wrapper img { width: 100%; height: 100%; object-fit: cover; }
+        .card-label-bar {
+            background: linear-gradient(135deg, var(--teal), var(--orange));
+            padding: 10px; text-align: center;
+            font-family: 'Bubblegum Sans', cursive; font-size: 1.1em; color: var(--white);
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 18px 40px; font-size: 1.4em; font-weight: 700;
+            border: none; border-radius: 20px; cursor: pointer;
+            font-family: 'Fredoka', sans-serif;
+            transition: all 0.3s; box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        .btn-primary { background: var(--teal); color: var(--white); }
+        .btn-primary:hover { background: var(--orange); transform: translateY(-3px); }
+        .btn-secondary { background: var(--orange); color: var(--white); }
+        .btn-secondary:hover { background: var(--red); transform: translateY(-3px); }
+        .btn-respond { background: var(--midnight); color: var(--white); display: none; margin-top: 4px; }
+        .btn-respond:hover { background: var(--teal); transform: translateY(-3px); }
+        .btn-respond.visible { display: inline-block; }
+        .btn-check { background: var(--midnight); color: var(--white); }
+        .btn-check:hover:not(:disabled) { background: var(--teal); transform: translateY(-3px); }
+        .btn-check:disabled { opacity: 0.35; cursor: not-allowed; transform: none; box-shadow: none; }
+
+        /* Drag section */
+        .drag-section { width: 100%; display: none; flex-direction: column; gap: 20px; animation: fadeSlideUp 0.4s ease forwards; }
+        .drag-section.visible { display: flex; }
+
+        @keyframes fadeSlideUp {
+            from { opacity: 0; transform: translateY(16px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Holding tray */
+        .holding-tray {
+            display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;
+            min-height: 90px; padding: 14px;
+            border-radius: 20px;
+            border: 2px dashed rgba(1,22,39,0.18);
+            background: rgba(1,22,39,0.03);
+        }
+        .tray-label {
+            width: 100%; text-align: center;
+            font-family: 'Bubblegum Sans', cursive; font-size: 1.1em;
+            color: var(--midnight); opacity: 0.45; margin-bottom: 4px;
+        }
+        /* Make tray a drop target too */
+        .holding-tray.drag-over-active {
+            background: rgba(1,22,39,0.08);
+            border-color: rgba(1,22,39,0.4);
+        }
+
+        /* Drop zones */
+        .drop-zones { display: flex; gap: 20px; }
+        .drop-zone {
+            flex: 1; min-height: 120px;
+            border-radius: 20px;
+            border: 3px dashed transparent;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.2s; position: relative; padding: 8px;
+        }
+        .drop-zone-world { border-color: rgba(231,29,54,0.35); background: rgba(231,29,54,0.04); }
+        .drop-zone-jesus { border-color: rgba(46,196,182,0.35); background: rgba(46,196,182,0.04); }
+        .drop-zone-world.drag-over-active { background: rgba(231,29,54,0.13); border-color: var(--red); transform: scale(1.02); }
+        .drop-zone-jesus.drag-over-active { background: rgba(46,196,182,0.13); border-color: var(--teal); transform: scale(1.02); }
+
+        .drop-zone-placeholder {
+            font-family: 'Bubblegum Sans', cursive; font-size: 1.05em;
+            opacity: 0.35; text-align: center; pointer-events: none; padding: 10px;
+        }
+        .drop-zone-world .drop-zone-placeholder { color: var(--red); }
+        .drop-zone-jesus .drop-zone-placeholder { color: var(--teal); }
+
+        /* Draggable bubbles */
+        .bubble {
+            border-radius: 18px; padding: 18px 22px;
+            cursor: grab; user-select: none;
+            transition: transform 0.2s, box-shadow 0.2s, opacity 0.2s;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.12);
+            width: 100%;
+        }
+        .bubble:active { cursor: grabbing; }
+        .bubble.dragging { opacity: 0.4; transform: scale(0.97); }
+        .bubble-a { background: #fff8f0; border: 2.5px solid var(--orange); }
+        .bubble-b { background: #f0f7ff; border: 2.5px solid #4a90d9; }
+        .holding-tray .bubble { width: calc(50% - 10px); min-width: 200px; }
+        .bubble-text { font-size: 1.1em; line-height: 1.5; color: var(--midnight); }
+
+        /* Result badge */
+        .result-badge {
+            position: absolute; top: -16px; right: -16px;
+            width: 44px; height: 44px; border-radius: 50%;
+            display: none; align-items: center; justify-content: center;
+            font-size: 1.5em; font-weight: 700;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.25); z-index: 10;
+        }
+        .result-badge.show { display: flex; }
+        .result-badge.correct { background: var(--green); color: var(--white); }
+        .result-badge.incorrect { background: var(--red); color: var(--white); }
+
+        /* Nav */
+        .nav-area { display: flex; gap: 16px; align-items: center; justify-content: center; flex-wrap: wrap; }
+        .card-counter { font-family: 'Bubblegum Sans', cursive; font-size: 1.4em; color: var(--midnight); opacity: 0.6; }
+
+        /* All done */
+        .all-done { text-align: center; padding: 40px 20px; display: none; }
+        .all-done.visible { display: block; }
+        .all-done h2 { font-family: 'Bubblegum Sans', cursive; font-size: 3em; color: var(--teal); margin-bottom: 16px; }
+        .all-done p { font-size: 1.4em; color: var(--midnight); margin-bottom: 24px; }
+
+        /* Fireworks */
+        .fireworks { position: fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:1999; }
+        .firework { position:absolute; width:5px; height:5px; border-radius:50%; animation: explode 1s ease-out forwards; }
+        @keyframes explode {
+            0%   { transform:translate(0,0) scale(1); opacity:1; }
+            100% { transform:translate(var(--tx),var(--ty)) scale(0); opacity:0; }
+        }
+
+        @media (max-width: 768px) {
+            .container { padding: 40px 20px; }
+            .title { font-size: 2.2em; }
+            .side-label { font-size: 1.3em; padding: 10px 18px; }
+            .drop-zones { flex-direction: column; }
+            .holding-tray .bubble { width: 100%; }
+            .home-button { top: 15px; right: 15px; padding: 10px 18px; font-size: 1.1em; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <a href="index.html" class="home-button">🏠 Home</a>
+
+    <div class="header">
+        <h1 class="title">📖 Kid Life - Bible Story Game</h1>
+        <p class="subtitle">How Should We Respond?</p>
+    </div>
+
+    <div class="side-labels">
+        <div class="side-label label-world">🌍 The World Says</div>
+        <div class="side-label label-jesus">✝️ Jesus Says</div>
+    </div>
+
+    <div class="play-area">
+
+        <!-- Deck -->
+        <div class="deck-wrapper" id="deckWrapper" onclick="flipNextCard()">
+            <div class="deck-shadow"></div>
+            <div class="deck-back">
+                <div class="deck-icon">♠</div>
+                <div class="deck-label">Tap to draw a card!</div>
+                <div class="deck-count" id="deckCount">4 cards remaining</div>
+            </div>
+        </div>
+
+        <!-- Card flip -->
+        <div class="card-scene" id="cardScene">
+            <div class="card-flip" id="cardFlip">
+                <div class="card-face card-back-face">📖</div>
+                <div class="card-face card-front">
+                    <div class="card-img-wrapper">
+                        <img id="cardImage" src="" alt="Story card">
+                    </div>
+                    <div class="card-label-bar" id="cardLabelBar">Card 1 of 4</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Choose How You Respond button -->
+        <button class="btn btn-respond" id="respondBtn" onclick="showDragSection()">
+            💬 Choose How You Respond
+        </button>
+
+        <!-- Drag & Drop Section -->
+        <div class="drag-section" id="dragSection">
+
+            <!-- Holding tray -->
+            <div class="holding-tray" id="holdingTray"
+                 ondragover="handleDragOver(event)"
+                 ondragenter="handleDragEnterTray(event)"
+                 ondragleave="handleDragLeaveTray(event)"
+                 ondrop="handleDropTray(event)">
+                <div class="tray-label" id="trayLabel">Drag each response to the correct side ↓</div>
+            </div>
+
+            <!-- Drop zones -->
+            <div class="drop-zones">
+                <div class="drop-zone drop-zone-world" id="zoneWorld" data-zone="world"
+                     ondragover="handleDragOver(event)"
+                     ondragenter="handleDragEnter(event,this)"
+                     ondragleave="handleDragLeave(event,this)"
+                     ondrop="handleDrop(event,this)">
+                    <span class="drop-zone-placeholder">🌍 Drop "The World Says"<br>response here</span>
+                    <div class="result-badge" id="badgeWorld"></div>
+                </div>
+                <div class="drop-zone drop-zone-jesus" id="zoneJesus" data-zone="jesus"
+                     ondragover="handleDragOver(event)"
+                     ondragenter="handleDragEnter(event,this)"
+                     ondragleave="handleDragLeave(event,this)"
+                     ondrop="handleDrop(event,this)">
+                    <span class="drop-zone-placeholder">✝️ Drop "Jesus Says"<br>response here</span>
+                    <div class="result-badge" id="badgeJesus"></div>
+                </div>
+            </div>
+
+            <!-- Nav row -->
+            <div class="nav-area" id="navArea">
+                <span class="card-counter" id="cardCounter">Card 1 of 4</span>
+                <button class="btn btn-check" id="checkBtn" onclick="checkAnswer()" disabled>✓ Check Answer</button>
+            </div>
+
+        </div>
+
+    </div><!-- /play-area -->
+
+    <!-- All Done -->
+    <div class="all-done" id="allDone">
+        <h2>🎉 Great Job!</h2>
+        <p>You made it through all the cards!<br>Remember: Jesus' way is always best! 💛</p>
+        <button class="btn btn-primary" onclick="restartGame()">🔄 Play Again</button>
+    </div>
+</div>
+
+<div class="fireworks" id="fireworksContainer"></div>
+
+<script>
+// ─────────────────────────────────────────────────────
+// CARD DATA
+// correctZone: 'world' = belongs under "The World Says"
+//              'jesus' = belongs under "Jesus Says"
+// ─────────────────────────────────────────────────────
+const cards = [
+    {
+        image: 'sermon-mount-images/playground-push.png',
+        bubbleA: {
+            text: "I'm going to get you!",
+            correctZone: 'world'
+        },
+        bubbleB: {
+            text: "Why did you do that?  Let's play nice.",
+            correctZone: 'jesus'
+        }
+    },
+    {
+        image: 'sermon-mount-images/snacktime.png',
+        bubbleA: {
+            text: 'No problem, have some of my snack.  Would you like some of my apple too?',
+            correctZone: 'jesus'
+        },
+        bubbleB: {
+            text: "It's not my fault you forgot your snack.  These are my favorite!",
+            correctZone: 'world'
+        }
+    },
+    {
+        image: 'sermon-mount-images/hallway-hi.png',
+        bubbleA: {
+            text: "I don't know you, don't talk to me.",
+            correctZone: 'world'
+        },
+        bubbleB: {
+            text: "Hi, I haven't met you before, what's your name?",
+            correctZone: 'jesus'
+        }
+    },
+    {
+        image: 'sermon-mount-images/chores.png',
+        bubbleA: {
+            text: "No way, I have my own chores to do at home.  You're on your own bucko!",
+            correctZone: 'world'
+        },
+        bubbleB: {
+            text: "No problem at all, I'm happy to help!",
+            correctZone: 'jesus'
+        }
+    }
+];
+
+// ─────────────────
+// STATE
+// ─────────────────
+let currentIndex   = -1;
+let hasFlipped     = false;
+let draggedId      = null;   // 'bubbleA' or 'bubbleB'
+// where each bubble currently lives: 'tray' | 'world' | 'jesus'
+let bubbleLocation = { bubbleA: 'tray', bubbleB: 'tray' };
+
+// ─────────────────
+// INIT
+// ─────────────────
+function init() {
+    currentIndex = -1;
+    hasFlipped   = false;
+    updateDeckCount();
+
+    document.getElementById('deckWrapper').style.display   = 'block';
+    document.getElementById('cardScene').classList.remove('visible');
+    el('respondBtn').classList.remove('visible');
+    el('respondBtn').style.display = '';
+    el('dragSection').classList.remove('visible');
+    el('allDone').classList.remove('visible');
+    el('cardFlip').classList.remove('flipped');
+    resetNavArea();
+}
+
+function resetNavArea() {
+    el('navArea').innerHTML = `
+        <span class="card-counter" id="cardCounter">Card 1 of 4</span>
+        <button class="btn btn-check" id="checkBtn" onclick="checkAnswer()" disabled>✓ Check Answer</button>
+    `;
+}
+
+function updateDeckCount() {
+    const rem = cards.length - (currentIndex + 1);
+    el('deckCount').textContent = rem === 1 ? '1 card remaining' : `${rem} cards remaining`;
+}
+
+// ─────────────────
+// DRAW CARD
+// ─────────────────
+function flipNextCard() {
+    if (hasFlipped) return;
+    currentIndex++;
+    if (currentIndex >= cards.length) { showAllDone(); return; }
+
+    hasFlipped = true;
+    const card = cards[currentIndex];
+    el('cardImage').src = card.image;
+    el('cardLabelBar').textContent = `Card ${currentIndex + 1} of ${cards.length}`;
+
+    el('deckWrapper').style.display = 'none';
+    el('cardScene').classList.add('visible');
+    el('cardFlip').classList.remove('flipped');
+    el('dragSection').classList.remove('visible');
+    el('respondBtn').classList.remove('visible');
+    el('respondBtn').style.display = '';
+
+    setTimeout(() => {
+        el('cardFlip').classList.add('flipped');
+        setTimeout(() => el('respondBtn').classList.add('visible'), 400);
+    }, 100);
+}
+
+// ─────────────────
+// SHOW DRAG SECTION
+// ─────────────────
+function showDragSection() {
+    el('respondBtn').style.display = 'none';
+
+    // Reset
+    bubbleLocation = { bubbleA: 'tray', bubbleB: 'tray' };
+    clearZoneEl('zoneWorld');
+    clearZoneEl('zoneJesus');
+    hideBadge('badgeWorld');
+    hideBadge('badgeJesus');
+
+    // Build tray
+    const tray = el('holdingTray');
+    // Remove old bubbles but keep the label
+    tray.querySelectorAll('.bubble').forEach(b => b.remove());
+
+    const card = cards[currentIndex];
+    const order = Math.random() < 0.5
+        ? ['bubbleA','bubbleB']
+        : ['bubbleB','bubbleA'];
+
+    order.forEach(id => {
+        const def = card[id];
+        const cssClass = id === 'bubbleA' ? 'bubble-a' : 'bubble-b';
+        tray.appendChild(makeBubble(id, def.text, cssClass));
+    });
+
+    el('cardCounter').textContent = `Card ${currentIndex + 1} of ${cards.length}`;
+    el('checkBtn').disabled = true;
+    el('dragSection').classList.add('visible');
+}
+
+function makeBubble(id, text, cssClass) {
+    const div = document.createElement('div');
+    div.className = `bubble ${cssClass}`;
+    div.id = id;
+    div.draggable = true;
+    div.innerHTML = `<div class="bubble-text">${text}</div>`;
+    div.addEventListener('dragstart', e => {
+        draggedId = id;
+        setTimeout(() => div.classList.add('dragging'), 0);
+        e.dataTransfer.effectAllowed = 'move';
+    });
+    div.addEventListener('dragend', () => {
+        div.classList.remove('dragging');
+        draggedId = null;
+    });
+    return div;
+}
+
+// ─────────────────
+// DRAG HANDLERS — zones
+// ─────────────────
+function handleDragOver(e) { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; }
+
+function handleDragEnter(e, zone) {
+    e.preventDefault();
+    zone.classList.add('drag-over-active');
+}
+
+function handleDragLeave(e, zone) {
+    if (!zone.contains(e.relatedTarget)) zone.classList.remove('drag-over-active');
+}
+
+function handleDrop(e, zone) {
+    e.preventDefault();
+    zone.classList.remove('drag-over-active');
+    if (!draggedId) return;
+
+    const targetZone = zone.dataset.zone;   // 'world' or 'jesus'
+    const incomingId = draggedId;
+
+    // If this zone already has a bubble, swap it back to the tray
+    const occupantId = Object.keys(bubbleLocation).find(k => bubbleLocation[k] === targetZone);
+    if (occupantId && occupantId !== incomingId) {
+        // Remove occupant from zone visually
+        const occupantEl = document.getElementById(occupantId);
+        if (occupantEl) occupantEl.remove();
+        bubbleLocation[occupantId] = 'tray';
+        // Re-add occupant to tray
+        const card = cards[currentIndex];
+        const def  = card[occupantId];
+        const css  = occupantId === 'bubbleA' ? 'bubble-a' : 'bubble-b';
+        el('holdingTray').appendChild(makeBubble(occupantId, def.text, css));
+    }
+
+    // Remove incoming from wherever it was
+    const incomingEl = document.getElementById(incomingId);
+    if (incomingEl) incomingEl.remove();
+
+    // Update state
+    bubbleLocation[incomingId] = targetZone;
+
+    // Re-render zone (clear placeholder, add bubble)
+    const card = cards[currentIndex];
+    const def  = card[incomingId];
+    const css  = incomingId === 'bubbleA' ? 'bubble-a' : 'bubble-b';
+
+    const placeholder = zone.querySelector('.drop-zone-placeholder');
+    if (placeholder) placeholder.style.display = 'none';
+
+    zone.insertBefore(makeBubble(incomingId, def.text, css), zone.querySelector('.result-badge'));
+
+    hideBadge(targetZone === 'world' ? 'badgeWorld' : 'badgeJesus');
+
+    // Enable check only when both zones filled
+    const worldFilled = Object.values(bubbleLocation).includes('world') ? Object.keys(bubbleLocation).find(k => bubbleLocation[k] === 'world') : null;
+    const jesusFilled = Object.values(bubbleLocation).includes('jesus') ? Object.keys(bubbleLocation).find(k => bubbleLocation[k] === 'jesus') : null;
+    el('checkBtn').disabled = !(worldFilled && jesusFilled);
+}
+
+// ─────────────────
+// DRAG HANDLERS — tray (return from zone)
+// ─────────────────
+function handleDragEnterTray(e) {
+    e.preventDefault();
+    el('holdingTray').classList.add('drag-over-active');
+}
+
+function handleDragLeaveTray(e) {
+    if (!el('holdingTray').contains(e.relatedTarget))
+        el('holdingTray').classList.remove('drag-over-active');
+}
+
+function handleDropTray(e) {
+    e.preventDefault();
+    el('holdingTray').classList.remove('drag-over-active');
+    if (!draggedId) return;
+
+    const incomingId = draggedId;
+    // Only do something if the bubble was in a zone (not already in tray)
+    if (bubbleLocation[incomingId] === 'tray') return;
+
+    const prevZone = bubbleLocation[incomingId];
+
+    // Remove from zone
+    const incomingEl = document.getElementById(incomingId);
+    if (incomingEl) incomingEl.remove();
+    bubbleLocation[incomingId] = 'tray';
+
+    // Show placeholder again in the now-empty zone
+    const zoneEl = prevZone === 'world' ? el('zoneWorld') : el('zoneJesus');
+    const placeholder = zoneEl.querySelector('.drop-zone-placeholder');
+    if (placeholder) placeholder.style.display = '';
+
+    // Add bubble back to tray
+    const card = cards[currentIndex];
+    const def  = card[incomingId];
+    const css  = incomingId === 'bubbleA' ? 'bubble-a' : 'bubble-b';
+    el('holdingTray').appendChild(makeBubble(incomingId, def.text, css));
+
+    hideBadge(prevZone === 'world' ? 'badgeWorld' : 'badgeJesus');
+    el('checkBtn').disabled = true;
+}
+
+// ─────────────────
+// CHECK ANSWER
+// ─────────────────
+function checkAnswer() {
+    const card = cards[currentIndex];
+
+    // Find which bubble is in which zone
+    const inWorld = Object.keys(bubbleLocation).find(k => bubbleLocation[k] === 'world');
+    const inJesus = Object.keys(bubbleLocation).find(k => bubbleLocation[k] === 'jesus');
+
+    const worldCorrect = inWorld && card[inWorld].correctZone === 'world';
+    const jesusCorrect = inJesus && card[inJesus].correctZone === 'jesus';
+
+    showBadge('badgeWorld', worldCorrect);
+    showBadge('badgeJesus', jesusCorrect);
+
+    el('checkBtn').disabled = true;
+
+    // Add next/finish button
+    const isLast = currentIndex >= cards.length - 1;
+    el('navArea').innerHTML = isLast
+        ? `<span class="card-counter">Card ${currentIndex+1} of ${cards.length}</span>
+           <button class="btn btn-secondary" onclick="showAllDone()">🎉 Finish!</button>`
+        : `<span class="card-counter">Card ${currentIndex+1} of ${cards.length}</span>
+           <button class="btn btn-check" disabled>✓ Check Answer</button>
+           <button class="btn btn-primary" onclick="nextCard()">Next Card ➜</button>`;
+}
+
+function showBadge(badgeId, correct) {
+    const b = el(badgeId);
+    b.textContent = correct ? '✓' : '✗';
+    b.className = `result-badge show ${correct ? 'correct' : 'incorrect'}`;
+}
+
+function hideBadge(badgeId) {
+    el(badgeId).className = 'result-badge';
+}
+
+// ─────────────────
+// NEXT CARD
+// ─────────────────
+function nextCard() {
+    hasFlipped = false;
+    el('dragSection').classList.remove('visible');
+    el('respondBtn').style.display = '';
+    el('respondBtn').classList.remove('visible');
+    el('cardScene').classList.remove('visible');
+    resetNavArea();
+    updateDeckCount();
+    el('deckWrapper').style.display = 'block';
+    setTimeout(flipNextCard, 600);
+}
+
+// ─────────────────
+// ALL DONE
+// ─────────────────
+function showAllDone() {
+    el('cardScene').classList.remove('visible');
+    el('deckWrapper').style.display = 'none';
+    el('respondBtn').classList.remove('visible');
+    el('dragSection').classList.remove('visible');
+    el('allDone').classList.add('visible');
+    launchFireworks();
+}
+
+function restartGame() {
+    el('allDone').classList.remove('visible');
+    resetNavArea();
+    init();
+}
+
+// ─────────────────
+// HELPERS
+// ─────────────────
+function el(id) { return document.getElementById(id); }
+
+function clearZoneEl(zoneId) {
+    const zone = el(zoneId);
+    zone.querySelectorAll('.bubble').forEach(b => b.remove());
+    const ph = zone.querySelector('.drop-zone-placeholder');
+    if (ph) ph.style.display = '';
+}
+
+// ─────────────────
+// FIREWORKS
+// ─────────────────
+function launchFireworks() {
+    const container = el('fireworksContainer');
+    const colors = ['#2ec4b6','#ff9f1c','#e71d36','#fdfffc','#22c55e'];
+    for (let i = 0; i < 12; i++) setTimeout(() => createFirework(container, colors), i * 300);
+}
+
+function createFirework(container, colors) {
+    const x = Math.random() * window.innerWidth;
+    const y = Math.random() * (window.innerHeight * 0.5);
+    for (let i = 0; i < 20; i++) {
+        const p = document.createElement('div');
+        p.className = 'firework';
+        p.style.left = x + 'px';
+        p.style.top  = y + 'px';
+        p.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        const angle = (Math.PI * 2 * i) / 20;
+        const v = 50 + Math.random() * 100;
+        p.style.setProperty('--tx', Math.cos(angle) * v + 'px');
+        p.style.setProperty('--ty', Math.sin(angle) * v + 'px');
+        container.appendChild(p);
+        setTimeout(() => p.remove(), 1000);
+    }
+}
+
+window.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
