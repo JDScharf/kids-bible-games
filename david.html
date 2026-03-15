@@ -199,8 +199,8 @@
         bottom: 28px;
         left: 50%;
         transform: translateX(-50%);
-        color: rgba(253, 255, 252, 0.6);
-        font-size: 1rem;
+        color: rgba(8, 8, 8, 0.6);
+        font-size: 2rem;
         z-index: 10;
         pointer-events: none;
       }
@@ -318,7 +318,11 @@
       // ── Difficulty state ──────────────────────────────────────────
       let difficulty = 'easy'; // 'easy' | 'hard'
 
+      // ── Session ID — incremented on each new game to invalidate stale timeouts ──
+      let sessionId = 0;
+
       function startGame(mode) {
+        sessionId++; // invalidate any pending timeouts from the previous game
         difficulty = mode;
         document.getElementById('msg').style.display = 'none';
         document.getElementById('difficultyScreen').style.display = 'none';
@@ -349,7 +353,7 @@
       }
 
       function restartToMenu() {
-        // reset these first before anything else happens
+        sessionId++; // invalidate any pending timeouts from the previous game
 
         document.getElementById('msg').style.display = 'none';
         document.getElementById('restart').style.display = 'none';
@@ -569,8 +573,6 @@
 
       // ── Audio ─────────────────────────────────────────────────────
       const hitSound = new Audio('hit_ouch.wav');
-
-      // Laugh sound — replace 'laugh.wav' with your uploaded file name
       const laughSound = new Audio('audio/short_insane_laugh.mp3');
 
       // ── Game state ────────────────────────────────────────────────
@@ -647,7 +649,6 @@
 
       function onDown(e) {
         if (stoneInFlight || gameOver) return;
-        // Only start drag if difficulty screen is hidden
         if (document.getElementById('difficultyScreen').style.display !== 'none') return;
         isDragging = true;
         dragStart = getPointer(e);
@@ -680,7 +681,6 @@
       renderer.domElement.addEventListener('touchend', onUp, { passive: false });
 
       // ── Collision check ───────────────────────────────────────────
-      // Returns 'head', 'body', or null
       function checkHitZone() {
         const gp = goliathGroup.position;
         const scale = goliathGroup.scale.x; // 1.7
@@ -689,9 +689,6 @@
         const dz = Math.abs(stone.position.z - gp.z);
 
         if (dx < 1.4 && dz < 1.5) {
-          // Head zone: head is at local y=4.1, scaled = 4.1*1.7 ≈ 6.97 world units above gp.y
-          // With gp.y=0, head center ≈ 7.0 world y; helmet up to ~8.2
-          // In world space, head range roughly 5.8 - 8.5
           if (dy >= 5.6 && dy <= 8.8) return 'head';
           if (dy >= 0.5 && dy < 5.6) return 'body';
         }
@@ -707,13 +704,13 @@
         stoneInFlight = false;
         stone.visible = false;
         spawnStars(stone.position.clone());
+        const sid = sessionId;
         setTimeout(() => {
-          if (!gameOver) resetGoliath();
+          if (!gameOver && sessionId === sid) resetGoliath();
         }, 1800);
       }
 
       function onBodyHit() {
-        // Easy mode: same as head hit. Hard mode: laugh.
         if (difficulty === 'easy') {
           onHeadHit();
           return;
@@ -723,7 +720,6 @@
         stone.visible = false;
         laughSound.currentTime = 0;
         laughSound.play().catch(() => {
-          // Fallback: synthesize a laugh with Web Audio if file not found
           try {
             const ctx = new (window.AudioContext || window.webkitAudioContext)();
             [0, 0.18, 0.36, 0.54, 0.72].forEach((t, i) => {
@@ -741,7 +737,6 @@
           } catch(e) {}
         });
 
-        // Goliath shakes/laughs
         laughMsg.style.display = 'block';
         laughMsg.style.animation = 'none';
         void laughMsg.offsetWidth;
@@ -761,9 +756,10 @@
         }, 80);
 
         clearTimeout(laughTimeout);
+        const sid = sessionId;
         laughTimeout = setTimeout(() => {
           laughMsg.style.display = 'none';
-          if (!gameOver) checkGameOver();
+          if (!gameOver && sessionId === sid) checkGameOver();
         }, 2000);
       }
 
@@ -850,8 +846,9 @@
           } else if (stonePos.y < 0 || stonePos.z < -30 || Math.abs(stonePos.x) > 20) {
             stoneInFlight = false;
             stone.visible = false;
+            const sid = sessionId;
             setTimeout(() => {
-              if (!gameOver) checkGameOver();
+              if (!gameOver && sessionId === sid) checkGameOver();
             }, 300);
           }
         } else if (!goliathHit && !gameOver && stonesLeft === 0) {
